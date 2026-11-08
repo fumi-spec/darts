@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 DARTS TOURNAMENT BOARD (Hybrid Sync)</title>
+    <title>🎯 DARTS TOURNAMENT BOARD (Pro Sync)</title>
     <style>
         :root { --primary: #121521; --dl3-color: #e94560; --dl2-color: #0097e6; --accent: #1e272e; --bg: #f1f3f6; --win-bg: #d4edda; --win-border: #28a745; --win-text: #155724; }
         * { box-sizing: border-box; }
@@ -152,7 +152,10 @@
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
         <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※この画面を開いたままにしておくと、出番が来た時に画面にお知らせが出ます。</p>
+        
         <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 ここをタップして「お知らせアラーム音」をオンにする</button>
+        <button id="force_pull_btn" class="notify-btn" style="background:#34495e; margin-bottom:15px;" onclick="forcePull()">🔄 最新の状況を手動で取得する</button>
+
         <select id="mypage_select" style="width:100%; padding:14px; font-size:1.1rem; margin-bottom:15px; border:2px solid var(--accent); border-radius:8px; font-weight:bold;" onchange="renderMyPage()">
             <option value="">▼ 自分のペアを選択してください</option>
         </select>
@@ -707,7 +710,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v38' && e.newValue) {
+    if (e.key === 'darts_hybrid_v39' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -715,7 +718,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v38', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v39', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -741,7 +744,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v38');
+        let saved = localStorage.getItem('darts_hybrid_v39');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -814,7 +817,18 @@ async function pushCloudState() {
     isSaving = false;
 }
 
+// 🛡️ 手動取得ボタン用の関数
+async function forcePull() {
+    let btn = document.getElementById('force_pull_btn');
+    if (btn) { btn.innerText = "🔄 取得中..."; btn.disabled = true; }
+    await pullCloudState();
+    if (btn) { btn.innerText = "🔄 最新の状況を手動で取得する"; btn.disabled = false; }
+}
+
 async function pullCloudState() {
+    // 🛡️ API節約：スマホの画面がスリープ中や別アプリを開いている時は通信をサボる！
+    if (document.hidden) return;
+
     if (isSaving || !jsonbinId) {
         if (document.getElementById('sync_badge') && currentMode === 'admin') {
             document.getElementById('sync_badge').innerText = '☁️ クラウド未設定';
@@ -831,7 +845,7 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v38', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v39', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge') && currentMode === 'admin') {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
@@ -851,9 +865,14 @@ window.onload = async () => {
     
     pullCloudState();
     
-    // 💡 ポップアップのテストがしやすいように、更新間隔を「10秒」に早めています！
-    // (本番ではAPI節約のためにもう少し長くする予定です)
-    setInterval(pullCloudState, 10000); 
+    // 🛡️ API節約エコモード：本部は15秒、スマホ（マイページ等）は45秒ごとに自動更新
+    let pollInterval = (currentMode === 'mypage' || currentMode === 'display') ? 45000 : 15000;
+    setInterval(pullCloudState, pollInterval); 
+    
+    // 🛡️ 参加者がスマホ画面を見たら（ロック解除等）、すぐに最新情報を取得！
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && jsonbinId) pullCloudState();
+    });
 };
 </script>
 </body>

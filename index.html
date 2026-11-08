@@ -669,13 +669,12 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v33' && e.newValue) {
+    if (e.key === 'darts_hybrid_v34' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
 });
 
-// 手動入力されたバケットIDを保存＆反映する関数
 function changeBucketId(val) {
     kvdbBucket = val.trim();
     localStorage.setItem('darts_manual_bucket', kvdbBucket);
@@ -684,7 +683,7 @@ function changeBucketId(val) {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v33', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v34', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -703,7 +702,6 @@ function loadLocal() {
         }
     }
     
-    // URLから合鍵（bin ID）を受け取る
     if (params.get('bin')) {
         kvdbBucket = params.get('bin');
     } else {
@@ -715,7 +713,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v33');
+        let saved = localStorage.getItem('darts_hybrid_v34');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -731,15 +729,22 @@ async function pushCloudState() {
     if (isSaving || !kvdbBucket) return;
     isSaving = true;
     let badge = document.getElementById('sync_badge');
-    badge.innerText = '⬆️ 送信中...'; badge.style.borderColor = '#f39c12';
+    if(badge) { badge.innerText = '⬆️ 送信中...'; badge.style.borderColor = '#f39c12'; }
     try { 
+        // 修正ポイント：ヘッダーに 'Content-Type': 'application/json' を追加
         let req = await fetch(`https://kvdb.io/${kvdbBucket}/${DATA_KEY}`, {
             method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(appState)
         }); 
-        if (req.ok) { badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71'; }
-        else { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
-    } catch(e) { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
+        if (req.ok) { 
+            if(badge) { badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71'; }
+        } else { 
+            if(badge) { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
+        }
+    } catch(e) { 
+        if(badge) { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
+    }
     isSaving = false;
 }
 
@@ -758,7 +763,7 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v33', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v34', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge')) {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 

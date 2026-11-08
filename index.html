@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 DARTS TOURNAMENT BOARD (Pro Sync)</title>
+    <title>🎯 DARTS TOURNAMENT BOARD (Pro Layout)</title>
     <style>
         :root { --primary: #121521; --dl3-color: #e94560; --dl2-color: #0097e6; --accent: #1e272e; --bg: #f1f3f6; --win-bg: #d4edda; --win-border: #28a745; --win-text: #155724; }
         * { box-sizing: border-box; }
@@ -15,35 +15,30 @@
         .tab-page { display: none; }
         .tab-page.active { display: block; }
         .machine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .machine-card { background: #fff; border: 2px solid #e2e8f0; border-top: 8px solid var(--dl3-color); padding: 12px 14px; border-radius: 10px; box-shadow: 0 4px 12px rgba(233,69,96,0.15); display: flex; flex-direction: column; justify-content: center; }
+        .machine-card { background: #fff; border: 2px solid #e2e8f0; border-top: 8px solid var(--dl3-color); padding: 16px; border-radius: 10px; box-shadow: 0 4px 12px rgba(233,69,96,0.15); display: flex; flex-direction: column; justify-content: center; }
         .machine-card.dl2 { border-top-color: var(--dl2-color); box-shadow: 0 4px 12px rgba(0,151,230,0.15); }
-        .m-now-container { text-align: center; padding-bottom: 10px; }
-        .m-now-title { font-size: 0.85rem; font-weight: bold; color: var(--dl3-color); margin-bottom: 6px; }
+        .m-now-container { text-align: center; padding-bottom: 6px; }
+        .m-now-title { font-size: 0.9rem; font-weight: bold; color: var(--dl3-color); margin-bottom: 6px; }
         .m-now-title.dl2 { color: var(--dl2-color); }
-        .m-now-players { font-size: 1.35rem; font-weight: 900; color: #111; letter-spacing: 0.5px; line-height: 1.3; }
-        .m-now-vs { color: #aaa; font-size: 0.95rem; margin: 0 6px; font-weight: bold; }
-        .m-next-box { background: #f8f9fa; border-left: 5px solid #f39c12; padding: 8px 12px; border-radius: 6px; margin-top: 6px; }
-        .m-next-title { font-size: 0.75rem; color: #d35400; font-weight: bold; margin-bottom: 4px; }
-        .m-next-players { font-size: 0.95rem; font-weight: bold; color: #333; }
+        .m-now-players { font-size: 1.5rem; font-weight: 900; color: #111; letter-spacing: 0.5px; line-height: 1.3; }
+        .m-now-vs { color: #aaa; font-size: 1rem; margin: 0 8px; font-weight: bold; }
         .card { background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
         h2 { font-size: 0.95rem; color: var(--primary); border-bottom: 2px solid #e0e4e8; padding-bottom: 5px; margin: 0 0 8px 0; display: flex; align-items: center; justify-content: space-between; }
         .robin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 1050px) { .robin-grid, .machine-grid { grid-template-columns: 1fr; } }
-        .table-scroll { max-height: 280px; overflow-y: auto; border: 1px solid #d8dde6; border-radius: 6px; }
-        table.robin-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        table.robin-table th, table.robin-table td { border: 1px solid #d8dde6; padding: 5px 2px; text-align: center; }
+        .table-scroll { max-height: 350px; overflow-y: auto; border: 1px solid #d8dde6; border-radius: 6px; }
+        table.robin-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        table.robin-table th, table.robin-table td { border: 1px solid #d8dde6; padding: 6px 4px; text-align: center; }
         table.robin-table th { background: #f4f6f9; color: #333; font-weight: bold; }
-        table.robin-table th.stat-head { background: #eef2f7; color: #0f3460; width: 28px; }
-        .col-code { width: 34px; }
+        table.robin-table th.stat-head { background: #eef2f7; color: #0f3460; width: 32px; }
+        .col-code { width: 38px; }
         .cell-self { background: #e9ecef; color: #999; }
         .cell-win { background: #eafaf1; font-weight: bold; color: #155724; }
         .cell-lose { background: #fdedec; color: #721c24; }
         .rank-qualify { background: #fff9db; font-weight: bold; color: #b7791f; }
-        .tiebreak-note { font-size: 0.68rem; color: #666; margin-top: 6px; line-height: 1.3; }
+        .tiebreak-note { font-size: 0.72rem; color: #666; margin-top: 6px; line-height: 1.3; }
         .tr-now { background-color: #fff9db !important; border: 2px solid #f1c40f; }
-        .tr-next { background-color: #f1f3f5 !important; border-left: 4px solid #f39c12 !important; }
         .badge-now { display: inline-block; background: #e74c3c; color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
-        .badge-next { display: inline-block; background: #f39c12; color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
         .mountain-scroll { overflow-x: auto; padding: 10px 4px; }
         .mountain-canvas { position: relative; width: 1040px; height: 600px; margin: 0 auto; background: #fafbfc; border: 1px solid #e2e8f0; border-radius: 10px; }
         .mountain-svg { position: absolute; top: 0; left: 0; width: 1040px; height: 600px; z-index: 1; pointer-events: none; }
@@ -65,31 +60,27 @@
         .vs-banner { background: #f8f9fa; border-radius: 8px; padding: 12px; text-align: center; margin: 10px 0; border: 1px solid #e2e8f0; }
         .vs-teams { font-size: 1.15rem; font-weight: bold; color: var(--primary); line-height: 1.45; }
         .score-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .big-score-btn { padding: 12px 6px; border: 2px solid #cbd5e0; background: #fff; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.15s; }
+        .big-score-btn { padding: 12px 10px; border: 2px solid #cbd5e0; background: #fff; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.15s; }
         .big-score-btn:hover { border-color: var(--primary); background: #f8f9fa; }
         .big-score-btn.left-win { border-left: 6px solid var(--dl3-color); }
         .big-score-btn.right-win { border-left: 6px solid var(--dl2-color); }
-        .big-score-btn .who-win { font-size: 0.78rem; font-weight: bold; color: #333; margin-bottom: 2px; }
+        .big-score-btn .who-win { font-size: 0.85rem; font-weight: bold; color: #333; margin-bottom: 2px; }
         .big-score-btn .leg-num { font-size: 1.25rem; font-weight: bold; color: var(--primary); }
-        .big-score-btn .leg-desc { font-size: 0.68rem; color: #666; }
         .confirm-box { background: #fffdf0; border: 2px solid #f1c40f; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
-        .champion-banner { background: linear-gradient(135deg, #ffd700, #ffae00); color: #121521; font-weight: bold; text-align: center; padding: 12px; border-radius: 8px; font-size: 1.15rem; margin-bottom: 10px; display: none; box-shadow: 0 3px 10px rgba(255, 174, 0, 0.4); }
+        .champion-banner { background: linear-gradient(135deg, #ffd700, #ffae00); color: #121521; font-weight: bold; text-align: center; padding: 14px; border-radius: 8px; font-size: 1.25rem; margin-bottom: 10px; display: none; box-shadow: 0 3px 10px rgba(255, 174, 0, 0.4); }
         input[type="text"], input[type="number"] { width: 95%; padding: 5px; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        .notify-btn { background: #e67e22; color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 1rem; cursor: pointer; box-shadow: 0 3px 8px rgba(230,126,34,0.3); margin-bottom: 15px; }
+        .notify-btn { background: #e67e22; color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 1rem; cursor: pointer; box-shadow: 0 3px 8px rgba(230,126,34,0.3); margin-bottom: 10px; }
         
-        /* 🔥 ド派手ポップアップ用のCSS */
         .match-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,21,33,0.98); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #fff; text-align: center; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .pop-machine { font-size: 2rem; font-weight: bold; margin-bottom: 15px; padding: 8px 20px; border-radius: 40px; background: #fff; color: #121521; }
         .pop-title { font-size: 1.6rem; color: #f1c40f; margin-bottom: 20px; font-weight: bold; }
         .pop-opp { font-size: 2.5rem; font-weight: 900; background: #e94560; padding: 20px 10px; border-radius: 12px; margin-bottom: 30px; width: 100%; max-width: 400px; box-shadow: 0 8px 25px rgba(233,69,96,0.5); line-height: 1.3; }
-        .pop-close { background: #2ecc71; color: #fff; border: none; padding: 18px 50px; font-size: 1.4rem; font-weight: bold; border-radius: 40px; cursor: pointer; box-shadow: 0 4px 15px rgba(46,204,113,0.4); transition: 0.2s; }
-        .pop-close:active { transform: scale(0.95); }
+        .pop-close { background: #2ecc71; color: #fff; border: none; padding: 18px 50px; font-size: 1.4rem; font-weight: bold; border-radius: 40px; cursor: pointer; box-shadow: 0 4px 15px rgba(46,204,113,0.4); }
     </style>
 </head>
 <body>
 
-<!-- 💥 試合開始ド派手ポップアップ -->
 <div id="match_popup" class="match-popup">
     <div id="pop_machine" class="pop-machine">🎯 DARTSLIVE</div>
     <div id="pop_title" class="pop-title">試合が始まりました！</div>
@@ -107,7 +98,7 @@
     <span class="sync-badge" id="sync_badge" style="background:rgba(255,255,255,0.2); border-color:#ccc; color:#fff;">☁️ クラウド未接続</span>
 </div>
 
-<!-- ================= 1. ロビン進行ボード画面 ================= -->
+<!-- ================= 1. ロビン進行ボード画面（モニター用・特大レイアウト） ================= -->
 <div id="page_board" class="tab-page active">
     <div id="champ_banner" class="champion-banner"></div>
     <div class="machine-grid">
@@ -124,19 +115,6 @@
             <div style="overflow-x:auto;" id="robin_B"></div>
         </div>
     </div>
-    <div class="card">
-        <h2>📝 ロビン全試合 進行スケジュール</h2>
-        <div class="robin-grid">
-            <div>
-                <h3 style="margin:0 0 6px 0; font-size:0.85rem; color:var(--dl3-color);" id="sched_title_A">■ DARTSLIVE3（Aロビン）</h3>
-                <div class="table-scroll"><table class="robin-table"><tbody id="sched_A"></tbody></table></div>
-            </div>
-            <div>
-                <h3 style="margin:0 0 6px 0; font-size:0.85rem; color:var(--dl2-color);" id="sched_title_B">■ DARTSLIVE2（Bロビン）</h3>
-                <div class="table-scroll"><table class="robin-table"><tbody id="sched_B"></tbody></table></div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- ================= 2. トーナメント ================= -->
@@ -147,14 +125,14 @@
     </div>
 </div>
 
-<!-- ================= 3. マイページ ================= -->
+<!-- ================= 3. マイページ（参加者用・完全手動同期でAPI消費ゼロ） ================= -->
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
-        <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※この画面を開いたままにしておくと、出番が来た時に画面にお知らせが出ます。</p>
+        <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※下のボタンを押すと、いつでも最新の対戦状況に更新できます。</p>
         
-        <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 ここをタップして「お知らせアラーム音」をオンにする</button>
-        <button id="force_pull_btn" class="notify-btn" style="background:#34495e; margin-bottom:15px;" onclick="forcePull()">🔄 最新の状況を手動で取得する</button>
+        <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 アラーム音をオンにする</button>
+        <button id="force_pull_btn" class="notify-btn" style="background:#27ae60; font-size:1.1rem; padding:16px; margin-bottom:20px;" onclick="forcePull()">🔄 最新の状況にアップデートする</button>
 
         <select id="mypage_select" style="width:100%; padding:14px; font-size:1.1rem; margin-bottom:15px; border:2px solid var(--accent); border-radius:8px; font-weight:bold;" onchange="renderMyPage()">
             <option value="">▼ 自分のペアを選択してください</option>
@@ -212,7 +190,7 @@
         </div>
 
         <button class="tab-btn" style="background:#8e44ad; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="unlockRobin()">🔁 トーナメントを一時中断してロビンを再修正する</button>
-        <button class="tab-btn" style="background:#c0392b; width:100%; padding:10px; font-size:0.9rem;" onclick="resetAll()">⚠️ すべての試合スコアを初期化する</button>
+        <button class="tab-btn" style="background:#c0392b; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="resetAll()">⚠️ すべての試合スコアを初期化する</button>
     </div>
 </div>
 
@@ -220,13 +198,10 @@
 let currentMode = "admin";
 let isSaving = false;
 let jsonbinId = null;
-
-// 👇👇 ふみのマスターキー 👇👇
 const JSONBIN_MASTER_KEY = "$2a$10$IaBXHSU6t2akxvJkSmkwwOpoel3zvxStuedU4ZxJ2xyz1OSB3jo6y"; 
 
 const T_QF1 = 200, T_QF2 = 201, T_SF1 = 202, T_SF2 = 203, T_3RD = 204, T_FINAL = 205;
 
-// === 🔔 通知とポップアップ処理 ===
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let notificationAllowed = false;
 let isFirstLoad = true;
@@ -249,7 +224,7 @@ function requestNotificationPermission() {
     playBeep(); 
     notificationAllowed = true;
     document.getElementById('notify_btn').style.display = 'none';
-    alert("アラーム音をオンにしました！\n出番が来たらポップアップと音でお知らせします。");
+    alert("アラーム音をオンにしました！");
 }
 
 function showMatchPopup(machine, title, opp) {
@@ -260,26 +235,14 @@ function showMatchPopup(machine, title, opp) {
     if (notificationAllowed) playBeep();
 }
 
-function closePopup() {
-    document.getElementById('match_popup').style.display = 'none';
-}
+function closePopup() { document.getElementById('match_popup').style.display = 'none'; }
 
-function triggerNotification(title, body, matchId, type, machine, mTitle, opp) {
-    let key = `${matchId}_${type}`;
-    if (notifiedMatches[key]) return; 
-    
-    // 記録を残す（初回ロード時も鳴らさないが記録はする）
+function triggerNotification(matchId, machine, mTitle, opp) {
+    let key = `${matchId}_now`;
+    if (notifiedMatches[key] || isFirstLoad) return; 
     notifiedMatches[key] = true;
-    
-    // ページを開いた瞬間に突然鳴るのを防ぐ
-    if (isFirstLoad) return; 
-    
-    // マイページで、かつ「試合中(now)」になった時にポップアップを発動！
-    if (type === 'now' && currentMode === 'mypage') {
-        showMatchPopup(machine, mTitle, opp);
-    }
+    if (currentMode === 'mypage') showMatchPopup(machine, mTitle, opp);
 }
-// ==============================
 
 function getRobinScheduleForCount(teamCount) {
     if (teamCount <= 1) return [];
@@ -373,19 +336,19 @@ function getAllMatchesMeta(stA, stB) {
 function renderBoardMachineCards(dl3Pending, dl2Pending) {
     let buildHTML = (machineName, isDl2, pendingList) => {
         let nowM = pendingList[0], nextM = pendingList[1], mColorCls = isDl2 ? 'dl2' : '';
-        let html = `<div class="m-header"><span class="m-badge ${mColorCls}">🎯 ${machineName}</span></div><div class="m-now-container" style="margin-top:8px;">`;
-        if (!nowM) html += `<div style="padding:15px 0; font-size:1.1rem; font-weight:bold; color:#27ae60;">✅ 全試合完了！</div>`;
+        let html = `<div class="m-header"><span class="m-badge ${mColorCls}" style="font-size:0.9rem; padding:4px 10px;">🎯 ${machineName}</span></div><div class="m-now-container" style="margin-top:12px;">`;
+        if (!nowM) html += `<div style="padding:20px 0; font-size:1.3rem; font-weight:bold; color:#27ae60;">✅ 全試合完了！</div>`;
         else {
             let leftStr = nowM.c1 ? `[${nowM.c1}] ${nowM.t1}` : nowM.t1;
             let rightStr = nowM.c2 ? `[${nowM.c2}] ${nowM.t2}` : nowM.t2;
-            html += `<div class="m-now-title ${mColorCls}">🔥 現在進行中: ${nowM.title}</div><div class="m-now-players">${leftStr} <span class="m-now-vs">VS</span> ${rightStr}</div>`;
+            html += `<div class="m-now-title ${mColorCls}" style="font-size:1rem;">🔥 現在進行中: ${nowM.title}</div><div class="m-now-players" style="font-size:1.8rem;">${leftStr} <span class="m-now-vs">VS</span> ${rightStr}</div>`;
         }
         html += `</div>`;
         if (nextM) {
             let leftNext = nextM.c1 ? `[${nextM.c1}] ${nextM.t1}` : nextM.t1;
             let rightNext = nextM.c2 ? `[${nextM.c2}] ${nextM.t2}` : nextM.t2;
-            html += `<div class="m-next-box"><div class="m-next-title">⚠️ 次の試合準備: ${nextM.title}</div><div class="m-next-players">${leftNext} <span style="font-size:0.8rem;color:#888;margin:0 4px;">vs</span> ${rightNext}</div></div>`;
-        } else { html += `<div style="text-align:center; font-size:0.8rem; color:#999; margin-top:10px;">次の試合はありません</div>`; }
+            html += `<div class="m-next-box" style="margin-top:10px; padding:10px 14px;"><div class="m-next-title" style="font-size:0.85rem;">⚠️ 次の試合準備: ${nextM.title}</div><div class="m-next-players" style="font-size:1.1rem;">${leftNext} <span style="font-size:0.9rem;color:#888;margin:0 4px;">vs</span> ${rightNext}</div></div>`;
+        } else { html += `<div style="text-align:center; font-size:0.85rem; color:#999; margin-top:10px;">次の試合はありません</div>`; }
         return html;
     };
     document.getElementById('now_dl3_card').innerHTML = buildHTML('DARTSLIVE3', false, dl3Pending);
@@ -401,7 +364,7 @@ function renderIntegratedRobin(blk, st) {
     html += `<th class="stat-head">勝</th><th class="stat-head">敗</th><th class="stat-head">得</th><th class="stat-head">失</th><th class="stat-head">差</th><th class="stat-head">位</th></tr></thead><tbody>`;
 
     st.byIndex.forEach((rowStat, i) => {
-        html += `<tr><th style="text-align:left; padding-left:6px; white-space:nowrap;">${blk}${i+1}: ${rowStat.short}</th>`;
+        html += `<tr><th style="text-align:left; padding-left:8px; white-space:nowrap; font-size:0.85rem;">${blk}${i+1}: ${rowStat.short}</th>`;
         for (let j = 0; j < pCount; j++) {
             if (i === j) html += `<td class="cell-self">×</td>`;
             else {
@@ -477,29 +440,6 @@ function renderMountainBracket(metaObj, isUnlocked) {
     document.getElementById('mountain_bracket_view').innerHTML = html;
 }
 
-function renderRobinSchedules(stA, stB, metaList, nowIdxA, nextIdxA, nowIdxB, nextIdxB) {
-    let buildRows = (rSched, baseIdx, nowI, nextI) => {
-        return rSched.map((_, r) => {
-            let mIdx = baseIdx + r, m = metaList.find(x => x.mIdx === mIdx);
-            if (!m) return '';
-            let sc = appState.matches[mIdx], done = sc && sc.s1 !== null;
-            let rowCls = mIdx === nowI ? 'tr-now' : (mIdx === nextI ? 'tr-next' : '');
-            let badgeHtml = mIdx === nowI ? `<span class="badge-now">試合中</span>` : (mIdx === nextI ? `<span class="badge-next">次準備</span>` : '');
-            let onClickAction = (currentMode === 'display' || currentMode === 'mypage') ? `alert('※この画面からは修正できません。')` : `openManualFix(${mIdx})`;
-            return `
-                <tr class="${rowCls}" style="cursor:pointer;" onclick="${appState.tournamentStarted ? `alert('トーナメント開始後はロビンの修正はロックされています')` : onClickAction}">
-                    <td style="width:75px;font-weight:bold;">第${r+1}戦${badgeHtml}</td>
-                    <td style="${done&&sc.s1>sc.s2?'font-weight:bold;':''}"><span style="color:#666;font-size:0.75rem;margin-right:4px;">[${m.c1}]</span>${m.t1}</td>
-                    <td style="width:55px;font-weight:bold;color:${done?'#e94560':'#999'};">${done ? `${sc.s1} - ${sc.s2}` : 'vs'}</td>
-                    <td style="${done&&sc.s2>sc.s1?'font-weight:bold;':''}"><span style="color:#666;font-size:0.75rem;margin-right:4px;">[${m.c2}]</span>${m.t2}</td>
-                </tr>
-            `;
-        }).join('');
-    };
-    document.getElementById('sched_A').innerHTML = buildRows(stA.rSched, 0, nowIdxA, nextIdxA);
-    document.getElementById('sched_B').innerHTML = buildRows(stB.rSched, 100, nowIdxB, nextIdxB);
-}
-
 function updateMyPageSelect() {
     let sel = document.getElementById('mypage_select'), cur = sel.value;
     let html = `<option value="">▼ 自分のペアを選択してください</option>`;
@@ -538,7 +478,7 @@ function renderMyPage() {
         } else if (isNow) { 
             statusHtml = `<span style="background:#e74c3c; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">🔥 試合中 (マシンへ！)</span>`; 
             cardStyle = 'background:#fff5f5; border:2px solid #e74c3c;';
-            triggerNotification('🔥 試合開始！', `[${m.machine}] ${m.title} が始まりました。`, m.mIdx, 'now', m.machine, m.title, opp);
+            triggerNotification(m.mIdx, m.machine, m.title, opp);
         } else if (isNext) { 
             statusHtml = `<span style="background:#f39c12; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">⚠️ 次の準備</span>`; 
             cardStyle = 'background:#fffdf0; border:2px solid #f1c40f;';
@@ -560,6 +500,7 @@ function renderMyPage() {
     content.innerHTML = html;
 }
 
+// 💥 【重要修正】決勝トーナメントも含めて「選手名（チーム名）」で選択できるように変更！
 function renderActiveInputCards(dl3List, dl2List, robinFinished, tStarted) {
     if (robinFinished && !tStarted) {
         document.getElementById('active_input_area').innerHTML = `
@@ -572,17 +513,21 @@ function renderActiveInputCards(dl3List, dl2List, robinFinished, tStarted) {
         return;
     }
     let buildCard = (machineName, isDl2, currentMatch) => {
-        if (!currentMatch) return `<div class="live-input-card ${isDl2?'dl2':''}" style="text-align:center; padding:30px 10px;"><h3 style="color:#28a745;">🎉 全試合完了！</h3></div>`;
-        let mIdx = currentMatch.mIdx, leftLabel = currentMatch.c1 ? `[${currentMatch.c1}] ${currentMatch.t1}` : currentMatch.t1, rightLabel = currentMatch.c2 ? `[${currentMatch.c2}] ${currentMatch.t2}` : currentMatch.t2;
+        if (!currentMatch) return `<div class="live-input-card ${isDl2?'dl2':''}" style="text-align:center; padding:30px 10px;"><h3 style="color:#27ae60;">🎉 全試合完了！</h3></div>`;
+        let mIdx = currentMatch.mIdx;
+        let leftName = currentMatch.t1, rightName = currentMatch.t2;
+        let leftLabel = currentMatch.c1 ? `[${currentMatch.c1}] ${leftName}` : leftName;
+        let rightLabel = currentMatch.c2 ? `[${currentMatch.c2}] ${rightName}` : rightName;
+
         return `
             <div class="live-input-card ${isDl2?'dl2':''}">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><span class="m-badge ${isDl2 ? 'dl2' : ''}">🎯 ${machineName}</span><span style="font-weight:bold; color:#555;">${currentMatch.title}</span></div>
                 <div class="vs-banner"><div class="vs-teams">${leftLabel}<br><span style="font-size:0.8rem; color:#888;">VS</span><br>${rightLabel}</div></div>
                 <div class="score-btn-grid">
-                    <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 0)"><div class="who-win">🏆 ${currentMatch.c1||'左'}勝ち</div><div class="leg-num">2-0</div></button>
-                    <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 0, 2)"><div class="who-win">🏆 ${currentMatch.c2||'右'}勝ち</div><div class="leg-num">0-2</div></button>
-                    <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 1)"><div class="who-win">🏆 ${currentMatch.c1||'左'}勝ち</div><div class="leg-num">2-1</div></button>
-                    <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 1, 2)"><div class="who-win">🏆 ${currentMatch.c2||'右'}勝ち</div><div class="leg-num">1-2</div></button>
+                    <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 0)"><div class="who-win">🏆 ${leftName} 勝ち</div><div class="leg-num">2 - 0</div></button>
+                    <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 0, 2)"><div class="who-win">🏆 ${rightName} 勝ち</div><div class="leg-num">0 - 2</div></button>
+                    <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 1)"><div class="who-win">🏆 ${leftName} 勝ち</div><div class="leg-num">2 - 1</div></button>
+                    <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 1, 2)"><div class="who-win">🏆 ${rightName} 勝ち</div><div class="leg-num">1 - 2</div></button>
                 </div>
             </div>
         `;
@@ -599,10 +544,10 @@ function renderManualFixBox() {
 
     document.getElementById('manual_fix_area').innerHTML = `
         <div class="score-btn-grid">
-            <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 0)"><div class="who-win">${m.t1}</div><div class="leg-num">2-0</div></button>
-            <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 0, 2)"><div class="who-win">${m.t2}</div><div class="leg-num">0-2</div></button>
-            <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 1)"><div class="who-win">${m.t1}</div><div class="leg-num">2-1</div></button>
-            <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 1, 2)"><div class="who-win">${m.t2}</div><div class="leg-num">1-2</div></button>
+            <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 0)"><div class="who-win">🏆 ${m.t1} 勝ち</div><div class="leg-num">2 - 0</div></button>
+            <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 0, 2)"><div class="who-win">🏆 ${m.t2} 勝ち</div><div class="leg-num">0 - 2</div></button>
+            <button class="big-score-btn left-win" onclick="submitQuickScore(${mIdx}, 2, 1)"><div class="who-win">🏆 ${m.t1} 勝ち</div><div class="leg-num">2 - 1</div></button>
+            <button class="big-score-btn right-win" onclick="submitQuickScore(${mIdx}, 1, 2)"><div class="who-win">🏆 ${m.t2} 勝ち</div><div class="leg-num">1 - 2</div></button>
         </div>
         <button class="tab-btn" style="background:#888; width:100%; margin-top:8px;" onclick="clearMatchScore(${mIdx})">この試合を「未入力」に戻す</button>
     `;
@@ -636,11 +581,6 @@ function renderAll() {
     let dl2Pending = metaList.filter(m => m.machine === 'DARTSLIVE2' && pendingFilter(m));
     renderBoardMachineCards(dl3Pending, dl2Pending);
 
-    let rPend3 = metaList.filter(m => m.machine === 'DARTSLIVE3' && appState.matches[m.mIdx].s1 === null && m.mIdx < 200);
-    let rPend2 = metaList.filter(m => m.machine === 'DARTSLIVE2' && appState.matches[m.mIdx].s1 === null && m.mIdx < 200);
-    renderRobinSchedules(stA, stB, metaList, rPend3[0]?.mIdx, rPend3[1]?.mIdx, rPend2[0]?.mIdx, rPend2[1]?.mIdx);
-    renderActiveInputCards(dl3Pending, dl2Pending, robinFinished, tStarted);
-
     updateMyPageSelect();
     if(document.getElementById('page_mypage').classList.contains('active')) renderMyPage();
 
@@ -654,7 +594,6 @@ function renderAll() {
         banner.style.display = 'block'; banner.innerText = `🏆 優勝：${fnSc.s1 > fnSc.s2 ? finalMeta.t1 : finalMeta.t2} おめでとうございます！ 🏆`;
     } else { banner.style.display = 'none'; }
     
-    // ページロード時の突然の通知を防ぐロックを解除
     isFirstLoad = false;
 }
 
@@ -710,7 +649,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v39' && e.newValue) {
+    if (e.key === 'darts_hybrid_v40' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -718,7 +657,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v39', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v40', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -744,7 +683,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v39');
+        let saved = localStorage.getItem('darts_hybrid_v40');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -817,18 +756,16 @@ async function pushCloudState() {
     isSaving = false;
 }
 
-// 🛡️ 手動取得ボタン用の関数
+// 🔄 手動で最新情報を取得する関数（スマホのAPI消費をゼロにするキモ！）
 async function forcePull() {
     let btn = document.getElementById('force_pull_btn');
     if (btn) { btn.innerText = "🔄 取得中..."; btn.disabled = true; }
     await pullCloudState();
-    if (btn) { btn.innerText = "🔄 最新の状況を手動で取得する"; btn.disabled = false; }
+    if (btn) { btn.innerText = "🔄 最新の状況にアップデートする"; btn.disabled = false; }
+    alert("最新の状況にアップデートしました！");
 }
 
 async function pullCloudState() {
-    // 🛡️ API節約：スマホの画面がスリープ中や別アプリを開いている時は通信をサボる！
-    if (document.hidden) return;
-
     if (isSaving || !jsonbinId) {
         if (document.getElementById('sync_badge') && currentMode === 'admin') {
             document.getElementById('sync_badge').innerText = '☁️ クラウド未設定';
@@ -845,15 +782,12 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v39', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v40', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge') && currentMode === 'admin') {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
                 document.getElementById('sync_badge').style.borderColor = '#2ecc71';
             }
-        } else if (req.status === 404) {
-            jsonbinId = null;
-            localStorage.removeItem('darts_jsonbin_id');
         }
     } catch(e) {}
 }
@@ -865,14 +799,10 @@ window.onload = async () => {
     
     pullCloudState();
     
-    // 🛡️ API節約エコモード：本部は15秒、スマホ（マイページ等）は45秒ごとに自動更新
-    let pollInterval = (currentMode === 'mypage' || currentMode === 'display') ? 45000 : 15000;
-    setInterval(pullCloudState, pollInterval); 
-    
-    // 🛡️ 参加者がスマホ画面を見たら（ロック解除等）、すぐに最新情報を取得！
-    document.addEventListener("visibilitychange", () => {
-        if (!document.hidden && jsonbinId) pullCloudState();
-    });
+    // 🛡️ 管理者用画面のみ15秒ごとに自動更新。スマホ(mypage)は完全手動（API消費ゼロ！）にして無限に使えるように防衛！
+    if (currentMode === 'admin' || currentMode === 'input') {
+        setInterval(pullCloudState, 15000); 
+    }
 };
 </script>
 </body>

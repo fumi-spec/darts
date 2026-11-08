@@ -278,13 +278,16 @@
 let currentMode = "admin";
 let roomId = "fumi-darts-live";
 let isSaving = false;
+let jsonbinId = null; // JSONBinのドキュメントIDを保存する変数
+
+const JSONBIN_MASTER_KEY = "$2a$10$r92.d/fXhB2y.wM46k4q/e.m25j/l7i.o57l3gM/p3/xG7yU.9z."; // APIキー（公開用デモキー相当）
 const T_QF1 = 200, T_QF2 = 201, T_SF1 = 202, T_SF2 = 203, T_3RD = 204, T_FINAL = 205;
 
 // === 🔔 通知とWeb Audioの準備 ===
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let notificationAllowed = false;
-let isFirstLoad = true; // 初回読み込み時に過去の通知が鳴らないようにするフラグ
-let notifiedMatches = {}; // 通知済みの状態を記録する { "mIdx_now": true }
+let isFirstLoad = true;
+let notifiedMatches = {}; 
 
 function playBeep() {
     try {
@@ -294,7 +297,7 @@ function playBeep() {
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // ピポーンという高い音
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
         osc.start();
         gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
@@ -304,7 +307,7 @@ function playBeep() {
 
 function requestNotificationPermission() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
-    playBeep(); // 音出しの許可（ユーザーアクション必須のため）
+    playBeep(); 
     if (!("Notification" in window)) {
         alert("このブラウザは通知に対応していません。音のみ鳴ります。");
         notificationAllowed = true;
@@ -315,7 +318,7 @@ function requestNotificationPermission() {
         notificationAllowed = true;
         document.getElementById('notify_btn').style.display = 'none';
         if (perm === "granted") {
-            alert("通知がオンになりました！\nブラウザの画面を開いたままお待ちください。出番が来たらお知らせします。");
+            alert("通知がオンになりました！\n出番が来たらお知らせします。");
         } else {
             alert("通知がブロックされましたが、出番が来た際のアラーム音は鳴ります！");
         }
@@ -324,7 +327,7 @@ function requestNotificationPermission() {
 
 function triggerNotification(title, body, matchId, type) {
     let key = `${matchId}_${type}`;
-    if (notifiedMatches[key] || isFirstLoad) return; // すでに通知済み、または初回読み込み時は鳴らさない
+    if (notifiedMatches[key] || isFirstLoad) return; 
     notifiedMatches[key] = true;
 
     if (notificationAllowed) playBeep();
@@ -355,7 +358,6 @@ let appState = {
     matches: Array.from({length: 220}, () => ({ s1: null, s2: null }))
 };
 
-// ...（初期値のセットアップ）
 for(let i=0; i<5; i++){
     appState.pairs.A.push({ p1: `選手${i*2+1}`, rt1: 12.0-i*0.6, p2: `選手${20-i*2}`, rt2: 6.3+i*0.6 });
     appState.pairs.B.push({ p1: `選手${i*2+2}`, rt1: 11.7-i*0.6, p2: `選手${19-i*2}`, rt2: 6.6+i*0.6 });
@@ -536,12 +538,13 @@ function renderMountainBracket(metaObj, isUnlocked) {
                 <path d="M 760 451 L 790 451 L 790 285" ${lineStyle(isDone(T_SF2) && isDone(T_FINAL) && fW===2)} />
                 <path d="M 790 285 L 820 285" ${lineStyle(isDone(T_FINAL))} />
             </svg>
-            <div class="slot-card seed" style="left:20px; top:30px;"><span><span class="slot-badge seed-b">A1位シード</span>${s.a1}</span></div>
+            <div class="slot-card seed" style="left:20px; top:30px;"><span><span class="slot-badge seed-b">A1位</span>${s.a1}</span></div>
             <div class="slot-card" style="left:20px; top:128px;"><span><span class="slot-badge">A2位</span>${s.a2}</span></div>
             <div class="slot-card" style="left:20px; top:198px;"><span><span class="slot-badge">B3位</span>${s.b3}</span></div>
             <div class="slot-card" style="left:20px; top:328px;"><span><span class="slot-badge">B2位</span>${s.b2}</span></div>
             <div class="slot-card" style="left:20px; top:398px;"><span><span class="slot-badge">A3位</span>${s.a3}</span></div>
-            <div class="slot-card seed" style="left:20px; top:496px;"><span><span class="slot-badge seed-b">B1位シード</span>${s.b1}</span></div>
+            <div class="slot-card seed" style="left:20px; top:496px;"><span><span class="slot-badge seed-b">B1位</span>${s.b1}</span></div>
+
             ${mNodeHtml(T_QF1, 305, 145, '準々決勝①')}
             ${mNodeHtml(T_QF2, 305, 345, '準々決勝②')}
             ${mNodeHtml(T_SF1, 565, 79, '準決勝① (A1登場)')}
@@ -617,12 +620,10 @@ function renderMyPage() {
         } else if (isNow) { 
             statusHtml = `<span style="background:#e74c3c; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">🔥 試合中 (マシンへ！)</span>`; 
             cardStyle = 'background:#fff5f5; border:2px solid #e74c3c;';
-            // 🔥 通知ロジック（試合開始）
             if (!isFirstLoad) triggerNotification('🔥 試合開始！', `[${m.machine}] ${m.title} が始まりました。マシンへ！`, m.mIdx, 'now');
         } else if (isNext) { 
             statusHtml = `<span style="background:#f39c12; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">⚠️ 次の準備</span>`; 
             cardStyle = 'background:#fffdf0; border:2px solid #f1c40f;';
-            // ⚠️ 通知ロジック（次の準備）
             if (!isFirstLoad) triggerNotification('⚠️ 次の準備', `次は [${m.machine}] ${m.title} です。マシンの近くで待機してください。`, m.mIdx, 'next');
         } else { 
             statusHtml = `<span style="background:#6c757d; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">⏳ 待機中</span>`; 
@@ -752,7 +753,7 @@ function renderAll() {
         banner.style.display = 'block'; banner.innerText = `🏆 優勝：${fnSc.s1 > fnSc.s2 ? finalMeta.t1 : finalMeta.t2} おめでとうございます！ 🏆`;
     } else { banner.style.display = 'none'; }
     
-    isFirstLoad = false; // 初回描画が終わったら通知許可フラグを解除
+    isFirstLoad = false;
 }
 
 function renderRosterInputs() {
@@ -808,7 +809,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v27' && e.newValue) {
+    if (e.key === 'darts_hybrid_v28' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -816,7 +817,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v27', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v28', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -838,7 +839,7 @@ function loadLocal() {
     if (document.getElementById('room_id_input')) document.getElementById('room_id_input').value = roomId;
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v27');
+        let saved = localStorage.getItem('darts_hybrid_v28');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -850,36 +851,64 @@ function resetAll() {
     }
 }
 
-// ☁️ 強化版クラウド同期
+// ☁️ JSONBin API 通信処理
+async function getOrCreateBin() {
+    let savedBinId = localStorage.getItem(`jsonbin_id_${roomId}`);
+    if (savedBinId) { jsonbinId = savedBinId; return; }
+
+    try {
+        let req = await fetch("https://api.jsonbin.io/v3/b", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_MASTER_KEY, "X-Bin-Name": `darts_${roomId}` },
+            body: JSON.stringify(appState)
+        });
+        let res = await req.json();
+        if (res && res.record) {
+            jsonbinId = res.metadata.id;
+            localStorage.setItem(`jsonbin_id_${roomId}`, jsonbinId);
+        }
+    } catch(e) { console.error("Create Bin Error:", e); }
+}
+
 async function pushCloudState() {
-    if (isSaving) return;
+    if (isSaving || !jsonbinId) return;
     isSaving = true;
     let badge = document.getElementById('sync_badge');
     badge.innerText = '⬆️ クラウド送信中...'; badge.style.borderColor = '#f39c12';
     try { 
-        let r = await fetch(`https://kvdb.io/A2x9kLp8zQ3vW1mN6rT4yB/${encodeURIComponent(roomId)}`, { method: 'PUT', body: JSON.stringify(appState) }); 
-        if (r.ok) { badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71'; }
+        let req = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}`, {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_MASTER_KEY },
+            body: JSON.stringify(appState)
+        }); 
+        if (req.ok) { badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71'; }
         else { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
     } catch(e) { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
     isSaving = false;
 }
 
 async function pullCloudState() {
-    if (isSaving) return;
+    if (isSaving || !jsonbinId) return;
     try {
-        let res = await fetch(`https://kvdb.io/A2x9kLp8zQ3vW1mN6rT4yB/${encodeURIComponent(roomId)}?t=${Date.now()}`);
-        if (res.ok) {
-            let remote = await res.json();
+        let req = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}/latest?meta=false`, {
+            headers: { "X-Master-Key": JSONBIN_MASTER_KEY }
+        });
+        if (req.ok) {
+            let remote = await req.json();
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v27', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v28', JSON.stringify(appState)); } catch(e){}
             }
         }
     } catch(e) {}
 }
 
-function changeRoomId(val) { roomId = val.trim() || "fumi-darts-live"; pullCloudState(); }
+function changeRoomId(val) { 
+    roomId = val.trim() || "fumi-darts-live"; 
+    jsonbinId = null;
+    initCloud();
+}
 function copyRoomLink() {
     let baseUrl = window.location.href.split('?')[0].split('#')[0];
     let url = `${baseUrl}?room=${encodeURIComponent(roomId)}&mode=mypage`;
@@ -887,11 +916,18 @@ function copyRoomLink() {
     .catch(() => { prompt('以下のURLをコピーしてQRコードにしてください:', url); });
 }
 
-window.onload = () => {
+async function initCloud() {
+    await getOrCreateBin();
+    pullCloudState();
+}
+
+window.onload = async () => {
     loadLocal(); renderRosterInputs(); renderAll();
     if (currentMode === 'input') showTab('input');
-    if (currentMode === 'mypage') { showTab('mypage'); setInterval(pullCloudState, 3000); pullCloudState(); }
-    else { setInterval(pullCloudState, 3000); pullCloudState(); } // 全モードで3秒おきにPullするよう徹底
+    if (currentMode === 'mypage') showTab('mypage'); 
+    
+    await initCloud();
+    setInterval(pullCloudState, 4000); 
 };
 </script>
 </body>

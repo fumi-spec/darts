@@ -5,68 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎯 DARTS TOURNAMENT BOARD (Hybrid Sync)</title>
     <style>
-        :root {
-            --primary: #121521;
-            --dl3-color: #e94560;
-            --dl2-color: #0097e6;
-            --accent: #1e272e;
-            --bg: #f1f3f6;
-            --win-bg: #d4edda;
-            --win-border: #28a745;
-            --win-text: #155724;
-        }
+        :root { --primary: #121521; --dl3-color: #e94560; --dl2-color: #0097e6; --accent: #1e272e; --bg: #f1f3f6; --win-bg: #d4edda; --win-border: #28a745; --win-text: #155724; }
         * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-            background: var(--bg);
-            color: #222;
-            margin: 0;
-            padding: 8px;
-            font-size: 0.9rem;
-        }
-
-        /* ナビバー */
-        .top-nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            background: var(--primary);
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        .tab-btn {
-            flex: 1;
-            min-width: 100px;
-            padding: 10px 6px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(255,255,255,0.12);
-            color: #fff;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-        .tab-btn.active {
-            background: var(--dl3-color);
-            box-shadow: 0 2px 6px rgba(233,69,96,0.4);
-        }
-        .sync-badge {
-            color: #fff;
-            font-size: 0.75rem;
-            padding: 5px 8px;
-            background: rgba(46, 204, 113, 0.2);
-            border: 1px solid #2ecc71;
-            border-radius: 20px;
-            font-weight: bold;
-            white-space: nowrap;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: #222; margin: 0; padding: 8px; font-size: 0.9rem; }
+        .top-nav { display: flex; flex-wrap: wrap; gap: 6px; background: var(--primary); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; align-items: center; }
+        .tab-btn { flex: 1; min-width: 100px; padding: 10px 6px; border: none; border-radius: 6px; background: rgba(255,255,255,0.12); color: #fff; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: 0.15s; }
+        .tab-btn.active { background: var(--dl3-color); box-shadow: 0 2px 6px rgba(233,69,96,0.4); }
+        .sync-badge { color: #fff; font-size: 0.75rem; padding: 5px 8px; background: rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; border-radius: 20px; font-weight: bold; white-space: nowrap; }
         .tab-page { display: none; }
         .tab-page.active { display: block; }
-
-        /* 現在進行バー */
         .machine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .machine-card { background: #fff; border: 2px solid #e2e8f0; border-top: 8px solid var(--dl3-color); padding: 12px 14px; border-radius: 10px; box-shadow: 0 4px 12px rgba(233,69,96,0.15); display: flex; flex-direction: column; justify-content: center; }
         .machine-card.dl2 { border-top-color: var(--dl2-color); box-shadow: 0 4px 12px rgba(0,151,230,0.15); }
@@ -78,13 +25,10 @@
         .m-next-box { background: #f8f9fa; border-left: 5px solid #f39c12; padding: 8px 12px; border-radius: 6px; margin-top: 6px; }
         .m-next-title { font-size: 0.75rem; color: #d35400; font-weight: bold; margin-bottom: 4px; }
         .m-next-players { font-size: 0.95rem; font-weight: bold; color: #333; }
-
-        /* カード・ロビン表・スクロール */
         .card { background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
         h2 { font-size: 0.95rem; color: var(--primary); border-bottom: 2px solid #e0e4e8; padding-bottom: 5px; margin: 0 0 8px 0; display: flex; align-items: center; justify-content: space-between; }
         .robin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 1050px) { .robin-grid, .machine-grid { grid-template-columns: 1fr; } }
-        
         .table-scroll { max-height: 280px; overflow-y: auto; border: 1px solid #d8dde6; border-radius: 6px; }
         table.robin-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
         table.robin-table th, table.robin-table td { border: 1px solid #d8dde6; padding: 5px 2px; text-align: center; }
@@ -96,13 +40,10 @@
         .cell-lose { background: #fdedec; color: #721c24; }
         .rank-qualify { background: #fff9db; font-weight: bold; color: #b7791f; }
         .tiebreak-note { font-size: 0.68rem; color: #666; margin-top: 6px; line-height: 1.3; }
-
         .tr-now { background-color: #fff9db !important; border: 2px solid #f1c40f; }
         .tr-next { background-color: #f1f3f5 !important; border-left: 4px solid #f39c12 !important; }
         .badge-now { display: inline-block; background: #e74c3c; color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
         .badge-next { display: inline-block; background: #f39c12; color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
-
-        /* 🏆 山型トーナメント */
         .mountain-scroll { overflow-x: auto; padding: 10px 4px; }
         .mountain-canvas { position: relative; width: 1040px; height: 600px; margin: 0 auto; background: #fafbfc; border: 1px solid #e2e8f0; border-radius: 10px; }
         .mountain-svg { position: absolute; top: 0; left: 0; width: 1040px; height: 600px; z-index: 1; pointer-events: none; }
@@ -110,7 +51,6 @@
         .slot-card.seed { border-color: #f39c12; background: #fffdf5; }
         .slot-badge { font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: var(--primary); color: #fff; margin-right: 6px; white-space: nowrap; }
         .slot-badge.seed-b { background: #e67e22; }
-
         .node-match { position: absolute; width: 195px; height: 80px; background: #fff; border: 2px solid #94a3b8; border-radius: 8px; padding: 7px 9px; z-index: 3; box-shadow: 0 3px 8px rgba(0,0,0,0.08); cursor: pointer; transition: 0.15s; display: flex; flex-direction: column; justify-content: space-between; }
         .node-match:hover { border-color: var(--dl3-color); transform: scale(1.02); }
         .node-match.done { border-color: var(--win-border); }
@@ -118,8 +58,6 @@
         .nm-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; font-weight: bold; color: #555; border-bottom: 1px solid #eee; padding-bottom: 2px; white-space: nowrap; }
         .nm-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 3px 6px; border-radius: 4px; background: #f8f9fa; white-space: nowrap; overflow: hidden; }
         .nm-row.win { background: var(--win-bg); color: var(--win-text); font-weight: bold; border-left: 3px solid var(--win-border); }
-
-        /* 入力画面・マイページ */
         .active-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 960px; margin: 0 auto 14px auto; }
         @media (max-width: 800px) { .active-input-grid { grid-template-columns: 1fr; } }
         .live-input-card { background: #fff; border-radius: 10px; border-top: 7px solid var(--dl3-color); padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
@@ -137,13 +75,10 @@
         .confirm-box { background: #fffdf0; border: 2px solid #f1c40f; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
         .champion-banner { background: linear-gradient(135deg, #ffd700, #ffae00); color: #121521; font-weight: bold; text-align: center; padding: 12px; border-radius: 8px; font-size: 1.15rem; margin-bottom: 10px; display: none; box-shadow: 0 3px 10px rgba(255, 174, 0, 0.4); }
         input[type="text"], input[type="number"] { width: 95%; padding: 5px; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        
-        /* 通知ボタン用 */
         .notify-btn { background: #e67e22; color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 1rem; cursor: pointer; box-shadow: 0 3px 8px rgba(230,126,34,0.3); margin-bottom: 15px; }
     </style>
 </head>
 <body>
-
 <div class="top-nav" id="main_nav">
     <button class="tab-btn active" id="nav_board" onclick="showTab('board', this)">📺 進行ボード</button>
     <button class="tab-btn" id="nav_bracket" onclick="showTab('bracket', this)">🏆 トーナメント</button>
@@ -188,26 +123,20 @@
 <!-- ================= 2. トーナメント ================= -->
 <div id="page_bracket" class="tab-page">
     <div class="card">
-        <h2>
-            <span>🏆 決勝トーナメント（2LEG先取）</span>
-            <span id="bracket_lock_msg" style="font-size:0.8rem; font-weight:bold;"></span>
-        </h2>
+        <h2><span>🏆 決勝トーナメント（2LEG先取）</span><span id="bracket_lock_msg" style="font-size:0.8rem; font-weight:bold;"></span></h2>
         <div class="mountain-scroll" id="mountain_bracket_view"></div>
     </div>
 </div>
 
-<!-- ================= 3. マイページ（スマホ・参加者閲覧用・通知機能付き） ================= -->
+<!-- ================= 3. マイページ ================= -->
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
         <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※この画面を開いたままにしておくと、出番が来た時に通知が鳴ります。</p>
-        
         <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 ここをタップして「出番のお知らせ通知」をオンにする</button>
-
         <select id="mypage_select" style="width:100%; padding:14px; font-size:1.1rem; margin-bottom:15px; border:2px solid var(--accent); border-radius:8px; font-weight:bold;" onchange="renderMyPage()">
             <option value="">▼ 自分のペアを選択してください</option>
         </select>
-
         <div id="mypage_content"></div>
     </div>
 </div>
@@ -219,14 +148,11 @@
         <p style="font-size:0.8rem; color:#555; margin:2px 0 0 0;" id="input_desc_msg">いま行われている試合だけが表示されています。</p>
     </div>
     <div id="active_input_area">
-        <div class="active-input-grid">
-            <div class="live-input-card" id="active_box_dl3"></div>
-            <div class="live-input-card dl2" id="active_box_dl2"></div>
-        </div>
+        <div class="active-input-grid"><div class="live-input-card" id="active_box_dl3"></div><div class="live-input-card dl2" id="active_box_dl2"></div></div>
     </div>
     <div class="card" style="max-width:960px; margin:0 auto;">
         <details>
-            <summary style="cursor:pointer; font-weight:bold; color:#555; padding:4px 0;">✏️ 終了した試合のスコアを修正する（手動選択）</summary>
+            <summary style="cursor:pointer; font-weight:bold; color:#555; padding:4px 0;">✏️ 終了した試合のスコアを修正する</summary>
             <div style="margin-top:10px; padding-top:10px; border-top:1px solid #eee;">
                 <select id="manual_match_select" style="width:100%; padding:8px; font-size:0.9rem; margin-bottom:8px;" onchange="renderManualFixBox()"></select>
                 <div id="manual_fix_area"></div>
@@ -239,9 +165,9 @@
 <div id="page_setup" class="tab-page">
     <div class="card">
         <h2>⚙️ 参加者一覧 ＆ ペア振り分け</h2>
-        <button class="tab-btn" style="background:#0f3460; width:100%; padding:12px; font-size:0.95rem; margin-bottom:14px;" onclick="autoBalancePairsFromList()">⚖️ 参加者一覧からペアとロビン（A/B）を作成する</button>
+        <button class="tab-btn" style="background:#0f3460; width:100%; padding:12px; font-size:0.95rem; margin-bottom:14px;" onclick="autoBalancePairsFromList()">⚖️ 参加者一覧からペアを作成する</button>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <h3 style="margin:0; font-size:0.92rem;">📝 参加者一覧（現在: <span id="roster_count_lbl">20</span>名）</h3>
+            <h3 style="margin:0; font-size:0.92rem;">📝 参加者一覧（現在: <span id="roster_count_lbl">0</span>名）</h3>
             <button class="tab-btn" style="background:#4a69bd; flex:none; padding:6px 14px;" onclick="addPlayerRow()">＋ 追加</button>
         </div>
         <div style="max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;">
@@ -251,22 +177,14 @@
             </table>
         </div>
         <div class="robin-grid">
-            <div>
-                <h3 style="color:var(--dl3-color); margin:0 0 6px 0;" id="setup_title_A">Aロビン ペア構成</h3>
-                <table class="robin-table"><tbody id="setup_A"></tbody></table>
-            </div>
-            <div>
-                <h3 style="color:var(--dl2-color); margin:0 0 6px 0;" id="setup_title_B">Bロビン ペア構成</h3>
-                <table class="robin-table"><tbody id="setup_B"></tbody></table>
-            </div>
+            <div><h3 style="color:var(--dl3-color); margin:0 0 6px 0;" id="setup_title_A">Aロビン ペア構成</h3><table class="robin-table"><tbody id="setup_A"></tbody></table></div>
+            <div><h3 style="color:var(--dl2-color); margin:0 0 6px 0;" id="setup_title_B">Bロビン ペア構成</h3><table class="robin-table"><tbody id="setup_B"></tbody></table></div>
         </div>
     </div>
-    
     <div class="card" style="text-align:center;">
         <div style="margin-bottom:15px; text-align:left;">
-            <label style="font-weight:bold; font-size:0.82rem;">クラウド同期ルームID (英数字):</label>
-            <input type="text" id="room_id_input" value="fumi-darts-live" style="margin-top:4px; padding:8px; font-weight:bold; text-align:left;" onchange="changeRoomId(this.value)">
-            <p style="font-size:0.75rem; color:#666; margin-top:4px;">※GitHub公開後、参加者のスマホと同期するために必須です。</p>
+            <label style="font-weight:bold; font-size:0.82rem;">📱 参加者スマホ展開用URLの準備:</label>
+            <p style="font-size:0.75rem; color:#666; margin-top:4px;">下のボタンを押すと、現在のクラウドデータに繋がる「合鍵付き」の専用URLがコピーされます。</p>
         </div>
         <button class="tab-btn" style="background:#28a745; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="copyRoomLink()">🔗 参加者スマホ閲覧用URL（マイページ）をコピー</button>
         <button class="tab-btn" style="background:#8e44ad; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="unlockRobin()">🔁 トーナメントを一時中断してロビンを再修正する</button>
@@ -276,14 +194,12 @@
 
 <script>
 let currentMode = "admin";
-let roomId = "fumi-darts-live";
 let isSaving = false;
-let jsonbinId = null; // JSONBinのドキュメントIDを保存する変数
-
-const JSONBIN_MASTER_KEY = "$2a$10$r92.d/fXhB2y.wM46k4q/e.m25j/l7i.o57l3gM/p3/xG7yU.9z."; // APIキー（公開用デモキー相当）
+let jsonbinId = null;
+const JSONBIN_MASTER_KEY = "$2a$10$r92.d/fXhB2y.wM46k4q/e.m25j/l7i.o57l3gM/p3/xG7yU.9z."; 
 const T_QF1 = 200, T_QF2 = 201, T_SF1 = 202, T_SF2 = 203, T_3RD = 204, T_FINAL = 205;
 
-// === 🔔 通知とWeb Audioの準備 ===
+// === 🔔 通知とWeb Audio ===
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let notificationAllowed = false;
 let isFirstLoad = true;
@@ -294,47 +210,27 @@ function playBeep() {
         if(audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
-        osc.stop(audioCtx.currentTime + 0.5);
+        osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5); osc.stop(audioCtx.currentTime + 0.5);
     } catch(e) {}
 }
-
 function requestNotificationPermission() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     playBeep(); 
-    if (!("Notification" in window)) {
-        alert("このブラウザは通知に対応していません。音のみ鳴ります。");
-        notificationAllowed = true;
-        document.getElementById('notify_btn').style.display = 'none';
-        return;
-    }
+    if (!("Notification" in window)) { alert("ブラウザが通知未対応です。音のみ鳴ります。"); notificationAllowed = true; document.getElementById('notify_btn').style.display = 'none'; return; }
     Notification.requestPermission().then(perm => {
-        notificationAllowed = true;
-        document.getElementById('notify_btn').style.display = 'none';
-        if (perm === "granted") {
-            alert("通知がオンになりました！\n出番が来たらお知らせします。");
-        } else {
-            alert("通知がブロックされましたが、出番が来た際のアラーム音は鳴ります！");
-        }
+        notificationAllowed = true; document.getElementById('notify_btn').style.display = 'none';
+        if (perm === "granted") alert("通知がオンになりました！"); else alert("通知はブロックされましたが、アラーム音は鳴ります！");
     });
 }
-
 function triggerNotification(title, body, matchId, type) {
     let key = `${matchId}_${type}`;
     if (notifiedMatches[key] || isFirstLoad) return; 
     notifiedMatches[key] = true;
-
     if (notificationAllowed) playBeep();
-    
-    if (notificationAllowed && Notification.permission === 'granted') {
-        try { new Notification(title, { body: body, icon: '🎯' }); } catch(e) {}
-    }
+    if (notificationAllowed && Notification.permission === 'granted') { try { new Notification(title, { body: body, icon: '🎯' }); } catch(e) {} }
 }
 // ==============================
 
@@ -345,28 +241,19 @@ function getRobinScheduleForCount(teamCount) {
     if (teamCount === 4) return [[0,1], [2,3], [0,2], [1,3], [0,3], [1,2]];
     if (teamCount === 5) return [[0,1], [2,3], [4,0], [1,2], [3,4], [0,2], [1,3], [2,4], [0,3], [1,4]];
     if (teamCount === 6) return [[0,1], [2,3], [4,5], [0,2], [3,5], [1,4], [0,3], [1,5], [2,4], [0,4], [2,5], [1,3], [0,5], [1,2], [3,4]];
-    let pairs = [];
-    for (let i = 0; i < teamCount; i++) { for (let j = i + 1; j < teamCount; j++) pairs.push([i, j]); }
-    return pairs;
+    let pairs = []; for (let i = 0; i < teamCount; i++) { for (let j = i + 1; j < teamCount; j++) pairs.push([i, j]); } return pairs;
 }
 
 let appState = {
-    updatedAt: 0,
-    tournamentStarted: false,
+    updatedAt: 0, tournamentStarted: false,
     roster: Array.from({length: 20}, (_, i) => ({ name: `選手${i+1}`, rt: Number((12.0 - i * 0.3).toFixed(1)) })),
     pairs: { A: [], B: [] },
     matches: Array.from({length: 220}, () => ({ s1: null, s2: null }))
 };
 
-for(let i=0; i<5; i++){
-    appState.pairs.A.push({ p1: `選手${i*2+1}`, rt1: 12.0-i*0.6, p2: `選手${20-i*2}`, rt2: 6.3+i*0.6 });
-    appState.pairs.B.push({ p1: `選手${i*2+2}`, rt1: 11.7-i*0.6, p2: `選手${19-i*2}`, rt2: 6.6+i*0.6 });
-}
-
 function ensureMatchesLength() {
     if (!appState.matches || appState.matches.length < 220) {
-        let old = appState.matches || [];
-        appState.matches = Array.from({length: 220}, (_, i) => old[i] || { s1: null, s2: null });
+        let old = appState.matches || []; appState.matches = Array.from({length: 220}, (_, i) => old[i] || { s1: null, s2: null });
     }
     if (appState.tournamentStarted === undefined) appState.tournamentStarted = false;
 }
@@ -379,10 +266,7 @@ function sortRobinStatsWithTiebreak(stats, map) {
         if (b.lf !== a.lf) return b.lf - a.lf;
         if (a.la !== b.la) return a.la - b.la;
         let res = map[`${a.idx}-${b.idx}`];
-        if (res && res.s1 !== null && res.s2 !== null) {
-            if (res.s1 > res.s2) return -1;
-            if (res.s2 > res.s1) return 1;
-        }
+        if (res && res.s1 !== null && res.s2 !== null) { if (res.s1 > res.s2) return -1; if (res.s2 > res.s1) return 1; }
         return a.idx - b.idx;
     });
 }
@@ -391,9 +275,7 @@ function calcRobinStats(blk) {
     ensureMatchesLength();
     let pairs = appState.pairs[blk], pCount = pairs.length;
     let rSched = getRobinScheduleForCount(pCount), matchesPerTeam = pCount > 0 ? pCount - 1 : 0;
-    let baseIdx = blk === 'A' ? 0 : 100;
-
-    let stats = pairs.map((pr, i) => ({ idx: i, code: `${blk}${i+1}`, short: getPairShort(blk, i), win: 0, lose: 0, lf: 0, la: 0, diff: 0, matchesPlayed: 0, rank: '-' }));
+    let baseIdx = blk === 'A' ? 0 : 100, stats = pairs.map((pr, i) => ({ idx: i, code: `${blk}${i+1}`, short: getPairShort(blk, i), win: 0, lose: 0, lf: 0, la: 0, diff: 0, matchesPlayed: 0, rank: '-' }));
     let map = {};
     rSched.forEach((p, r) => {
         let sc = appState.matches[baseIdx + r];
@@ -403,12 +285,10 @@ function calcRobinStats(blk) {
                 stats[p[0]].matchesPlayed++; stats[p[1]].matchesPlayed++;
                 stats[p[0]].lf += sc.s1; stats[p[0]].la += sc.s2;
                 stats[p[1]].lf += sc.s2; stats[p[1]].la += sc.s1;
-                if (sc.s1 > sc.s2) { stats[p[0]].win++; stats[p[1]].lose++; }
-                else { stats[p[1]].win++; stats[p[0]].lose++; }
+                if (sc.s1 > sc.s2) { stats[p[0]].win++; stats[p[1]].lose++; } else { stats[p[1]].win++; stats[p[0]].lose++; }
             }
         }
     });
-
     stats.forEach(s => s.diff = s.lf - s.la);
     let sorted = sortRobinStatsWithTiebreak(stats, map);
     let allFinished = stats.length > 0 && stats.every(s => s.matchesPlayed === matchesPerTeam);
@@ -433,21 +313,20 @@ function getAllMatchesMeta(stA, stB) {
     let sf1L = getL(T_SF1, a1, qf1W, '準決勝① 敗者'), sf2L = getL(T_SF2, b1, qf2W, '準決勝② 敗者');
 
     meta.push(
-        { mIdx: T_QF1,   title: '準々決勝① (A2位 vs B3位)', machine: 'DARTSLIVE3', t1: a2, t2: b3 },
-        { mIdx: T_QF2,   title: '準々決勝② (B2位 vs A3位)', machine: 'DARTSLIVE2', t1: b2, t2: a3 },
-        { mIdx: T_SF1,   title: '準決勝① (A1位シード戦)',   machine: 'DARTSLIVE3', t1: a1, t2: qf1W },
-        { mIdx: T_SF2,   title: '準決勝② (B1位シード戦)',   machine: 'DARTSLIVE2', t1: b1, t2: qf2W },
+        { mIdx: T_QF1,   title: '準々決勝①', machine: 'DARTSLIVE3', t1: a2, t2: b3 },
+        { mIdx: T_QF2,   title: '準々決勝②', machine: 'DARTSLIVE2', t1: b2, t2: a3 },
+        { mIdx: T_SF1,   title: '準決勝①',   machine: 'DARTSLIVE3', t1: a1, t2: qf1W },
+        { mIdx: T_SF2,   title: '準決勝②',   machine: 'DARTSLIVE2', t1: b1, t2: qf2W },
         { mIdx: T_3RD,   title: '3位決定戦',                 machine: 'DARTSLIVE2', t1: sf1L, t2: sf2L },
         { mIdx: T_FINAL, title: '👑 決勝戦',                 machine: 'DARTSLIVE3', t1: sf1W, t2: sf2W }
     );
     return { list: meta, seeds: { a1, a2, a3, b1, b2, b3 } };
 }
 
-// ------------------- ボード＆トーナメント描画 -------------------
 function renderBoardMachineCards(dl3Pending, dl2Pending) {
     let buildHTML = (machineName, isDl2, pendingList) => {
         let nowM = pendingList[0], nextM = pendingList[1], mColorCls = isDl2 ? 'dl2' : '';
-        let html = `<div class="m-header"><span class="m-badge ${mColorCls}">🎯 ${machineName}</span><span style="font-size:0.75rem;color:#666;">01 - CR - 01 (2LEG)</span></div><div class="m-now-container" style="margin-top:8px;">`;
+        let html = `<div class="m-header"><span class="m-badge ${mColorCls}">🎯 ${machineName}</span></div><div class="m-now-container" style="margin-top:8px;">`;
         if (!nowM) html += `<div style="padding:15px 0; font-size:1.1rem; font-weight:bold; color:#27ae60;">✅ 全試合完了！</div>`;
         else {
             let leftStr = nowM.c1 ? `[${nowM.c1}] ${nowM.t1}` : nowM.t1;
@@ -469,8 +348,7 @@ function renderBoardMachineCards(dl3Pending, dl2Pending) {
 function renderIntegratedRobin(blk, st) {
     let pCount = appState.pairs[blk].length, baseIdx = blk === 'A' ? 0 : 100, map = {};
     st.rSched.forEach((p, r) => { let sc = appState.matches[baseIdx + r]; map[`${p[0]}-${p[1]}`] = sc; map[`${p[1]}-${p[0]}`] = sc ? { s1: sc.s2, s2: sc.s1 } : null; });
-
-    document.getElementById('title_robin_' + blk).innerText = `📊 ${blk}ロビン 順位表（${pCount}組・全${st.rSched.length}戦）`;
+    document.getElementById('title_robin_' + blk).innerText = `📊 ${blk}ロビン 順位表（${pCount}組）`;
     let html = `<table class="robin-table"><thead><tr><th>ペア名</th>`;
     for (let i = 0; i < pCount; i++) html += `<th class="col-code">${blk}${i+1}</th>`;
     html += `<th class="stat-head">勝</th><th class="stat-head">敗</th><th class="stat-head">得</th><th class="stat-head">失</th><th class="stat-head">差</th><th class="stat-head">位</th></tr></thead><tbody>`;
@@ -489,21 +367,17 @@ function renderIntegratedRobin(blk, st) {
         let isTop3 = typeof rowStat.rank === 'number' && rowStat.rank <= 3;
         html += `<td style="font-weight:bold;">${rowStat.matchesPlayed>0?rowStat.win:'-'}</td><td>${rowStat.matchesPlayed>0?rowStat.lose:'-'}</td><td>${rowStat.matchesPlayed>0?rowStat.lf:'-'}</td><td>${rowStat.matchesPlayed>0?rowStat.la:'-'}</td><td>${rowStat.matchesPlayed>0?(rowStat.diff>0?'+'+rowStat.diff:rowStat.diff):'-'}</td><td class="${isTop3?'rank-qualify':''}">${rankDisplay}${isTop3?'🎯':''}</td></tr>`;
     });
-    html += `</tbody></table><div class="tiebreak-note">※同率時: 1.勝 2.得LEG 3.失LEG 4.直接対決 5.COUNT-UP</div>`;
+    html += `</tbody></table><div class="tiebreak-note">※同率時: 1.勝 2.得L 3.失L 4.直接対決 5.CU</div>`;
     document.getElementById('robin_' + blk).innerHTML = html;
 }
 
 function renderMountainBracket(metaObj, isUnlocked) {
-    let metaList = metaObj.list, s = metaObj.seeds;
-    let findM = idx => metaList.find(x => x.mIdx === idx) || { machine: 'DARTSLIVE3', t1: '未定', t2: '未定' };
+    let metaList = metaObj.list, s = metaObj.seeds, findM = idx => metaList.find(x => x.mIdx === idx) || { machine: 'DARTSLIVE3', t1: '未定', t2: '未定' };
     let sc = idx => appState.matches[idx] || { s1: null, s2: null };
-    let isDone = idx => sc(idx).s1 !== null;
-    let winSide = idx => isDone(idx) ? (sc(idx).s1 > sc(idx).s2 ? 1 : 2) : 0;
-
+    let isDone = idx => sc(idx).s1 !== null, winSide = idx => isDone(idx) ? (sc(idx).s1 > sc(idx).s2 ? 1 : 2) : 0;
     let msgEl = document.getElementById('bracket_lock_msg');
     if (isUnlocked) { msgEl.innerText = "※枠をクリックすると結果入力ができます"; msgEl.style.color = "#27ae60"; }
     else { msgEl.innerText = "※ロビン全試合完了と本部の確定までロックされています"; msgEl.style.color = "#e94560"; }
-
     let lineStyle = active => active ? `stroke="#e94560" stroke-width="3.5" fill="none" stroke-linecap="square"` : `stroke="#94a3b8" stroke-width="2.5" fill="none" stroke-linecap="square"`;
 
     let mNodeHtml = (mIdx, leftPx, topPx, label) => {
@@ -517,7 +391,6 @@ function renderMountainBracket(metaObj, isUnlocked) {
             </div>
         `;
     };
-
     let q1W = winSide(T_QF1), q2W = winSide(T_QF2), s1W = winSide(T_SF1), s2W = winSide(T_SF2), fW = winSide(T_FINAL);
     let html = `
         <div class="mountain-canvas">
@@ -547,8 +420,8 @@ function renderMountainBracket(metaObj, isUnlocked) {
 
             ${mNodeHtml(T_QF1, 305, 145, '準々決勝①')}
             ${mNodeHtml(T_QF2, 305, 345, '準々決勝②')}
-            ${mNodeHtml(T_SF1, 565, 79, '準決勝① (A1登場)')}
-            ${mNodeHtml(T_SF2, 565, 411, '準決勝② (B1登場)')}
+            ${mNodeHtml(T_SF1, 565, 79, '準決勝①')}
+            ${mNodeHtml(T_SF2, 565, 411, '準決勝②')}
             ${mNodeHtml(T_FINAL, 820, 245, '👑 優勝決定戦')}
             <div style="position:absolute; left:820px; top:442px; font-size:0.75rem; font-weight:bold; color:#666;">▼ 準決勝敗者による3位決定戦</div>
             ${mNodeHtml(T_3RD, 820, 462, '🥉 3位決定戦')}
@@ -580,35 +453,29 @@ function renderRobinSchedules(stA, stB, metaList, nowIdxA, nextIdxA, nowIdxB, ne
     document.getElementById('sched_B').innerHTML = buildRows(stB.rSched, 100, nowIdxB, nextIdxB);
 }
 
-// 📱 マイページ用描画（通知機能発火もここで行う）
 function updateMyPageSelect() {
     let sel = document.getElementById('mypage_select'), cur = sel.value;
     let html = `<option value="">▼ 自分のペアを選択してください</option>`;
-    ['A', 'B'].forEach(blk => {
-        appState.pairs[blk].forEach((pr, i) => { html += `<option value="${blk}${i+1}">${blk}${i+1}: ${pr.p1}・${pr.p2}</option>`; });
-    });
+    ['A', 'B'].forEach(blk => { appState.pairs[blk].forEach((pr, i) => { html += `<option value="${blk}${i+1}">${blk}${i+1}: ${pr.p1}・${pr.p2}</option>`; }); });
     sel.innerHTML = html;
     if (cur) sel.value = cur;
 }
 
 function renderMyPage() {
     let sel = document.getElementById('mypage_select'), pairCode = sel.value, content = document.getElementById('mypage_content');
-    if (!pairCode) { content.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">ペアを選択するとここにスケジュールが表示されます。</div>`; return; }
+    if (!pairCode) { content.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">ペアを選択するとスケジュールが表示されます。</div>`; return; }
 
     let pairObj = null, blk = pairCode.charAt(0), idx = parseInt(pairCode.substring(1)) - 1;
     if(blk && !isNaN(idx)) pairObj = appState.pairs[blk][idx];
     let pairShortName = pairObj ? `${pairObj.p1}・${pairObj.p2}` : '';
-
-    let stA = calcRobinStats('A'), stB = calcRobinStats('B');
-    let metaList = getAllMatchesMeta(stA, stB).list, tStarted = appState.tournamentStarted;
-
+    let stA = calcRobinStats('A'), stB = calcRobinStats('B'), metaList = getAllMatchesMeta(stA, stB).list, tStarted = appState.tournamentStarted;
     let myMatches = metaList.filter(m => m.c1 === pairCode || m.c2 === pairCode || (pairShortName && (m.t1.includes(pairShortName) || m.t2.includes(pairShortName))));
+    
     if (myMatches.length === 0) { content.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">まだ試合が組まれていません。</div>`; return; }
 
     let html = `<div style="display:grid; gap:10px;">`;
     myMatches.forEach(m => {
         let sc = appState.matches[m.mIdx], isDone = sc && sc.s1 !== null, isNow = false, isNext = false;
-        
         let pending = metaList.filter(x => x.machine === m.machine && appState.matches[x.mIdx].s1 === null && (tStarted ? true : x.mIdx < 200));
         if (pending[0] && pending[0].mIdx === m.mIdx) isNow = true;
         if (pending[1] && pending[1].mIdx === m.mIdx) isNext = true;
@@ -652,19 +519,15 @@ function renderActiveInputCards(dl3List, dl2List, robinFinished, tStarted) {
         document.getElementById('active_input_area').innerHTML = `
             <div class="confirm-box">
                 <h2 style="color:#e67e22; border:none; justify-content:center; margin-bottom:10px;">✅ 予選ロビン 全試合完了！</h2>
-                <p style="font-size:1rem; font-weight:bold; color:#444; margin-bottom:20px;">
-                    順位表を確認し、間違いがなければ決勝トーナメントを開始してください。<br><span style="color:#e74c3c; font-size:0.85rem;">※開始するとロビンのスコアはロックされます。</span>
-                </p>
-                <button style="background:#e94560; color:#fff; border:none; padding:16px 24px; font-size:1.15rem; font-weight:bold; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(233,69,96,0.3);" onclick="startTournament()">🏆 順位を確定して決勝トーナメントを開始する</button>
+                <p style="font-size:1rem; font-weight:bold; color:#444; margin-bottom:20px;">順位を確定して決勝トーナメントを開始してください。<br><span style="color:#e74c3c; font-size:0.85rem;">※開始するとロビンのスコアはロックされます。</span></p>
+                <button style="background:#e94560; color:#fff; border:none; padding:16px 24px; font-size:1.15rem; font-weight:bold; border-radius:8px; cursor:pointer;" onclick="startTournament()">🏆 決勝トーナメントを開始する</button>
             </div>
         `;
         return;
     }
-
     let buildCard = (machineName, isDl2, currentMatch) => {
         if (!currentMatch) return `<div class="live-input-card ${isDl2?'dl2':''}" style="text-align:center; padding:30px 10px;"><h3 style="color:#28a745;">🎉 全試合完了！</h3></div>`;
         let mIdx = currentMatch.mIdx, leftLabel = currentMatch.c1 ? `[${currentMatch.c1}] ${currentMatch.t1}` : currentMatch.t1, rightLabel = currentMatch.c2 ? `[${currentMatch.c2}] ${currentMatch.t2}` : currentMatch.t2;
-
         return `
             <div class="live-input-card ${isDl2?'dl2':''}">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><span class="m-badge ${isDl2 ? 'dl2' : ''}">🎯 ${machineName}</span><span style="font-weight:bold; color:#555;">${currentMatch.title}</span></div>
@@ -685,8 +548,8 @@ function renderManualFixBox() {
     let stA = calcRobinStats('A'), stB = calcRobinStats('B'), metaList = getAllMatchesMeta(stA, stB).list;
     let mIdx = parseInt(document.getElementById('manual_match_select').value || 0), m = metaList.find(x => x.mIdx === mIdx);
     if (!m) return;
-    if (mIdx < 200 && appState.tournamentStarted) { document.getElementById('manual_fix_area').innerHTML = `<p style="color:#e94560; font-weight:bold; text-align:center;">トーナメント開始済みのため、ロビンの修正はロックされています。</p>`; return; }
-    if (mIdx >= 200 && !appState.tournamentStarted) { document.getElementById('manual_fix_area').innerHTML = `<p style="color:#e94560; font-weight:bold; text-align:center;">ロビン確定前のため、トーナメントの入力はロックされています。</p>`; return; }
+    if (mIdx < 200 && appState.tournamentStarted) { document.getElementById('manual_fix_area').innerHTML = `<p style="color:#e94560; font-weight:bold; text-align:center;">トーナメント開始済みのためロックされています。</p>`; return; }
+    if (mIdx >= 200 && !appState.tournamentStarted) { document.getElementById('manual_fix_area').innerHTML = `<p style="color:#e94560; font-weight:bold; text-align:center;">ロビン確定前のためロックされています。</p>`; return; }
 
     document.getElementById('manual_fix_area').innerHTML = `
         <div class="score-btn-grid">
@@ -699,19 +562,11 @@ function renderManualFixBox() {
     `;
 }
 
-function startTournament() {
-    if (confirm('順位を確定し、決勝トーナメントを開始しますか？\n（※ロビンのスコアはロックされます）')) {
-        appState.tournamentStarted = true; appState.updatedAt = Date.now(); saveLocal();
-    }
-}
-function unlockRobin() {
-    if (confirm('本当にトーナメントを中断してロビンのロックを解除しますか？\n（入力済みのスコアはそのまま残ります）')) {
-        appState.tournamentStarted = false; appState.updatedAt = Date.now(); saveLocal();
-    }
-}
+function startTournament() { if (confirm('順位を確定し、決勝トーナメントを開始しますか？')) { appState.tournamentStarted = true; appState.updatedAt = Date.now(); saveLocal(); } }
+function unlockRobin() { if (confirm('本当にトーナメントを中断してロビンのロックを解除しますか？')) { appState.tournamentStarted = false; appState.updatedAt = Date.now(); saveLocal(); } }
 function openManualFix(mIdx) {
-    if (mIdx < 200 && appState.tournamentStarted) { alert('トーナメント開始後はロビンの修正はロックされています。\n設定タブからロックを解除してください。'); return; }
-    if (mIdx >= 200 && !appState.tournamentStarted) { alert('ロビン完了後、本部の確定ボタンが押されるまで入力できません！'); return; }
+    if (mIdx < 200 && appState.tournamentStarted) { alert('トーナメント開始後はロックされています。設定タブから解除してください。'); return; }
+    if (mIdx >= 200 && !appState.tournamentStarted) { alert('本部の確定ボタンが押されるまで入力できません！'); return; }
     document.getElementById('manual_match_select').value = mIdx;
     document.querySelectorAll('.top-nav .tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('nav_input').classList.add('active');
@@ -752,7 +607,6 @@ function renderAll() {
         let finalMeta = metaList.find(x => x.mIdx === T_FINAL) || { t1: '左', t2: '右' };
         banner.style.display = 'block'; banner.innerText = `🏆 優勝：${fnSc.s1 > fnSc.s2 ? finalMeta.t1 : finalMeta.t2} おめでとうございます！ 🏆`;
     } else { banner.style.display = 'none'; }
-    
     isFirstLoad = false;
 }
 
@@ -765,8 +619,7 @@ function renderRosterInputs() {
 function addPlayerRow() { appState.roster.push({ name: `選手${appState.roster.length+1}`, rt: 6.0 }); renderRosterInputs(); saveLocal(); }
 function deletePlayerRow(i) { appState.roster.splice(i, 1); renderRosterInputs(); saveLocal(); }
 function updateRoster(i, field, val) {
-    if (field === 'rt') appState.roster[i].rt = parseFloat(val) || 5.0;
-    else appState.roster[i].name = val;
+    if (field === 'rt') appState.roster[i].rt = parseFloat(val) || 5.0; else appState.roster[i].name = val;
     appState.updatedAt = Date.now(); renderSetupPairs(); saveLocal();
 }
 
@@ -809,7 +662,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v28' && e.newValue) {
+    if (e.key === 'darts_hybrid_v29' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -817,7 +670,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v28', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v29', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -835,11 +688,17 @@ function loadLocal() {
             document.getElementById('main_nav').style.display = 'none';
         }
     }
-    if (params.get('room')) roomId = params.get('room');
-    if (document.getElementById('room_id_input')) document.getElementById('room_id_input').value = roomId;
+    
+    // 🔥 URLから合鍵（bin ID）を受け取る
+    if (params.get('bin')) {
+        jsonbinId = params.get('bin');
+        localStorage.setItem('darts_bin_id', jsonbinId);
+    } else {
+        jsonbinId = localStorage.getItem('darts_bin_id');
+    }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v28');
+        let saved = localStorage.getItem('darts_hybrid_v29');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -853,21 +712,19 @@ function resetAll() {
 
 // ☁️ JSONBin API 通信処理
 async function getOrCreateBin() {
-    let savedBinId = localStorage.getItem(`jsonbin_id_${roomId}`);
-    if (savedBinId) { jsonbinId = savedBinId; return; }
-
+    if (jsonbinId) return; 
     try {
         let req = await fetch("https://api.jsonbin.io/v3/b", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_MASTER_KEY, "X-Bin-Name": `darts_${roomId}` },
+            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_MASTER_KEY, "X-Bin-Name": `darts_tourney` },
             body: JSON.stringify(appState)
         });
         let res = await req.json();
         if (res && res.record) {
             jsonbinId = res.metadata.id;
-            localStorage.setItem(`jsonbin_id_${roomId}`, jsonbinId);
+            localStorage.setItem(`darts_bin_id`, jsonbinId);
         }
-    } catch(e) { console.error("Create Bin Error:", e); }
+    } catch(e) {}
 }
 
 async function pushCloudState() {
@@ -890,35 +747,32 @@ async function pushCloudState() {
 async function pullCloudState() {
     if (isSaving || !jsonbinId) return;
     try {
-        let req = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}/latest?meta=false`, {
-            headers: { "X-Master-Key": JSONBIN_MASTER_KEY }
-        });
+        let req = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}/latest?meta=false`, { headers: { "X-Master-Key": JSONBIN_MASTER_KEY } });
         if (req.ok) {
             let remote = await req.json();
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v28', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v29', JSON.stringify(appState)); } catch(e){}
             }
         }
     } catch(e) {}
 }
 
-function changeRoomId(val) { 
-    roomId = val.trim() || "fumi-darts-live"; 
-    jsonbinId = null;
-    initCloud();
-}
+// 🔥 URLに「合鍵（bin ID）」を含めてコピーする
 function copyRoomLink() {
     let baseUrl = window.location.href.split('?')[0].split('#')[0];
-    let url = `${baseUrl}?room=${encodeURIComponent(roomId)}&mode=mypage`;
+    if (!jsonbinId) {
+        alert("まだクラウドの保存箱が作成されていません。\n1〜2秒待ってからもう一度押してください。"); return;
+    }
+    let url = `${baseUrl}?mode=mypage&bin=${jsonbinId}`;
     navigator.clipboard.writeText(url).then(() => { alert('参加者用のマイページURLをコピーしました！\nこれをQRコードにして皆に共有してください。'); })
     .catch(() => { prompt('以下のURLをコピーしてQRコードにしてください:', url); });
 }
 
 async function initCloud() {
-    await getOrCreateBin();
-    pullCloudState();
+    if (currentMode !== 'mypage') await getOrCreateBin(); 
+    if (jsonbinId) pullCloudState();
 }
 
 window.onload = async () => {

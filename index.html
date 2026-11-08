@@ -77,25 +77,24 @@
         input[type="text"], input[type="number"] { width: 95%; padding: 5px; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
         .notify-btn { background: #e67e22; color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 1rem; cursor: pointer; box-shadow: 0 3px 8px rgba(230,126,34,0.3); margin-bottom: 15px; }
         
-        /* 🔥 ポップアップ用のCSS */
-        .match-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,21,33,0.96); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #fff; text-align: center; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* 🔥 ド派手ポップアップ用のCSS */
+        .match-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18,21,33,0.98); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #fff; text-align: center; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .pop-machine { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; padding: 5px 15px; border-radius: 30px; background: #fff; color: #121521; }
-        .pop-title { font-size: 1.4rem; color: #f1c40f; margin-bottom: 20px; font-weight: bold; }
-        .pop-opp { font-size: 2.2rem; font-weight: 900; background: #e94560; padding: 20px; border-radius: 12px; margin-bottom: 30px; width: 100%; max-width: 400px; box-shadow: 0 8px 20px rgba(233,69,96,0.4); }
-        .pop-close { background: #2ecc71; color: #fff; border: none; padding: 16px 50px; font-size: 1.3rem; font-weight: bold; border-radius: 40px; cursor: pointer; box-shadow: 0 4px 15px rgba(46,204,113,0.4); transition: 0.2s; }
+        .pop-machine { font-size: 2rem; font-weight: bold; margin-bottom: 15px; padding: 8px 20px; border-radius: 40px; background: #fff; color: #121521; }
+        .pop-title { font-size: 1.6rem; color: #f1c40f; margin-bottom: 20px; font-weight: bold; }
+        .pop-opp { font-size: 2.5rem; font-weight: 900; background: #e94560; padding: 20px 10px; border-radius: 12px; margin-bottom: 30px; width: 100%; max-width: 400px; box-shadow: 0 8px 25px rgba(233,69,96,0.5); line-height: 1.3; }
+        .pop-close { background: #2ecc71; color: #fff; border: none; padding: 18px 50px; font-size: 1.4rem; font-weight: bold; border-radius: 40px; cursor: pointer; box-shadow: 0 4px 15px rgba(46,204,113,0.4); transition: 0.2s; }
         .pop-close:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
-<!-- 💥 試合開始ポップアップ画面 -->
+<!-- 💥 試合開始ド派手ポップアップ -->
 <div id="match_popup" class="match-popup">
     <div id="pop_machine" class="pop-machine">🎯 DARTSLIVE</div>
     <div id="pop_title" class="pop-title">試合が始まりました！</div>
-    <div style="font-size:1rem; margin-bottom:8px; color:#aaa;">対戦相手</div>
+    <div style="font-size:1.1rem; margin-bottom:8px; color:#aaa; font-weight:bold;">▼ 今すぐ対戦ボードへ！ 対戦相手 ▼</div>
     <div id="pop_opp" class="pop-opp">相手ペア名</div>
-    <p style="font-size:1rem; margin-bottom:25px; line-height:1.5;">対戦ボードへ向かってください！</p>
     <button class="pop-close" onclick="closePopup()">確認しました</button>
 </div>
 
@@ -152,8 +151,8 @@
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
-        <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※この画面を開いたままにしておくと、出番が来た時に通知が鳴ります。</p>
-        <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 ここをタップして「出番のお知らせ機能」をオンにする</button>
+        <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※この画面を開いたままにしておくと、出番が来た時に画面にお知らせが出ます。</p>
+        <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 ここをタップして「お知らせアラーム音」をオンにする</button>
         <select id="mypage_select" style="width:100%; padding:14px; font-size:1.1rem; margin-bottom:15px; border:2px solid var(--accent); border-radius:8px; font-weight:bold;" onchange="renderMyPage()">
             <option value="">▼ 自分のペアを選択してください</option>
         </select>
@@ -203,17 +202,12 @@
     </div>
     
     <div class="card" style="text-align:center;">
-        <div style="margin-bottom:15px; text-align:left; background:#e8f4f8; padding:12px; border-radius:8px;">
-            <label style="font-weight:bold; font-size:0.85rem; color:#0f3460;">① まず無料クラウドで「箱」を作ります</label>
-            <p style="font-size:0.75rem; color:#333; margin:4px 0 10px 0;">
-                <a href="https://kvdb.io/" target="_blank" style="color:#e94560; font-weight:bold; text-decoration:underline;">https://kvdb.io/</a>
-                を開き、画面に大きく表示された英数字をコピーしてください。
-            </p>
-            <label style="font-weight:bold; font-size:0.85rem; color:#0f3460;">② コピーした鍵（バケットID）をここに貼り付け:</label>
-            <input type="text" id="bucket_id_input" placeholder="ここに貼り付け..." style="margin-top:4px; padding:10px; font-weight:bold; text-align:left; border:2px solid #0f3460; width:100%;" onchange="changeBucketId(this.value)">
+        <div style="margin-bottom:15px; text-align:left; background:#fffdf0; padding:15px; border-radius:8px; border: 2px solid #f1c40f;">
+            <h3 style="margin-top:0; color:#d35400; font-size:1.05rem;">🌐 スマホ連携用URLの発行（全自動）</h3>
+            <p style="font-size:0.8rem; color:#333; margin:8px 0;">下のボタンを押すと、システムが自動でクラウド上に新しい保存場所を作り、参加者に配る用のURLをコピーします。</p>
+            <button class="tab-btn" style="background:#e67e22; width:100%; padding:14px; font-size:1.1rem; margin-top:8px; box-shadow:0 4px 10px rgba(230,126,34,0.3);" onclick="startAutoCloudSync()">🚀 スマホと連携スタート ＆ URLコピー</button>
         </div>
 
-        <button class="tab-btn" style="background:#28a745; width:100%; padding:12px; margin-bottom:15px; font-size:0.95rem;" onclick="copyRoomLink()">🔗 ③ 参加者スマホ閲覧用URL（マイページ）をコピー</button>
         <button class="tab-btn" style="background:#8e44ad; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="unlockRobin()">🔁 トーナメントを一時中断してロビンを再修正する</button>
         <button class="tab-btn" style="background:#c0392b; width:100%; padding:10px; font-size:0.9rem;" onclick="resetAll()">⚠️ すべての試合スコアを初期化する</button>
     </div>
@@ -224,12 +218,12 @@ let currentMode = "admin";
 let isSaving = false;
 let jsonbinId = null;
 
-// 👇👇 ふみ専用マスターキーに変更済み 👇👇
+// 👇👇 ふみのマスターキー 👇👇
 const JSONBIN_MASTER_KEY = "$2a$10$IaBXHSU6t2akxvJkSmkwwOpoel3zvxStuedU4ZxJ2xyz1OSB3jo6y"; 
 
 const T_QF1 = 200, T_QF2 = 201, T_SF1 = 202, T_SF2 = 203, T_3RD = 204, T_FINAL = 205;
 
-// === 🔔 通知とポップアップ ===
+// === 🔔 通知とポップアップ処理 ===
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let notificationAllowed = false;
 let isFirstLoad = true;
@@ -252,7 +246,7 @@ function requestNotificationPermission() {
     playBeep(); 
     notificationAllowed = true;
     document.getElementById('notify_btn').style.display = 'none';
-    alert("通知オンにしました！\n出番が来たらポップアップと音でお知らせします。");
+    alert("アラーム音をオンにしました！\n出番が来たらポップアップと音でお知らせします。");
 }
 
 function showMatchPopup(machine, title, opp) {
@@ -269,14 +263,17 @@ function closePopup() {
 
 function triggerNotification(title, body, matchId, type, machine, mTitle, opp) {
     let key = `${matchId}_${type}`;
-    if (notifiedMatches[key] || isFirstLoad) return; 
+    if (notifiedMatches[key]) return; 
+    
+    // 記録を残す（初回ロード時も鳴らさないが記録はする）
     notifiedMatches[key] = true;
     
-    // 試合開始（now）のときだけド派手ポップアップを発動！
+    // ページを開いた瞬間に突然鳴るのを防ぐ
+    if (isFirstLoad) return; 
+    
+    // マイページで、かつ「試合中(now)」になった時にポップアップを発動！
     if (type === 'now' && currentMode === 'mypage') {
         showMatchPopup(machine, mTitle, opp);
-    } else if (notificationAllowed) {
-        playBeep();
     }
 }
 // ==============================
@@ -538,11 +535,10 @@ function renderMyPage() {
         } else if (isNow) { 
             statusHtml = `<span style="background:#e74c3c; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">🔥 試合中 (マシンへ！)</span>`; 
             cardStyle = 'background:#fff5f5; border:2px solid #e74c3c;';
-            if (!isFirstLoad) triggerNotification('🔥 試合開始！', `[${m.machine}] ${m.title} が始まりました。`, m.mIdx, 'now', m.machine, m.title, opp);
+            triggerNotification('🔥 試合開始！', `[${m.machine}] ${m.title} が始まりました。`, m.mIdx, 'now', m.machine, m.title, opp);
         } else if (isNext) { 
             statusHtml = `<span style="background:#f39c12; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">⚠️ 次の準備</span>`; 
             cardStyle = 'background:#fffdf0; border:2px solid #f1c40f;';
-            if (!isFirstLoad) triggerNotification('⚠️ 次の準備', `次は [${m.machine}] ${m.title} です。マシンの近くで待機してください。`, m.mIdx, 'next', m.machine, m.title, opp);
         } else { 
             statusHtml = `<span style="background:#6c757d; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">⏳ 待機中</span>`; 
         }
@@ -654,6 +650,8 @@ function renderAll() {
         let finalMeta = metaList.find(x => x.mIdx === T_FINAL) || { t1: '左', t2: '右' };
         banner.style.display = 'block'; banner.innerText = `🏆 優勝：${fnSc.s1 > fnSc.s2 ? finalMeta.t1 : finalMeta.t2} おめでとうございます！ 🏆`;
     } else { banner.style.display = 'none'; }
+    
+    // ページロード時の突然の通知を防ぐロックを解除
     isFirstLoad = false;
 }
 
@@ -709,21 +707,15 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v37' && e.newValue) {
+    if (e.key === 'darts_hybrid_v38' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
 });
 
-function changeBucketId(val) {
-    jsonbinId = val.trim();
-    localStorage.setItem('darts_jsonbin_id', jsonbinId);
-    pullCloudState();
-}
-
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v37', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v38', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -745,15 +737,11 @@ function loadLocal() {
     if (params.get('bin')) {
         jsonbinId = params.get('bin');
     } else {
-        jsonbinId = localStorage.getItem('darts_jsonbin_id') || "";
-    }
-
-    if (document.getElementById('bucket_id_input')) {
-        document.getElementById('bucket_id_input').value = jsonbinId;
+        jsonbinId = localStorage.getItem('darts_jsonbin_id') || null;
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v37');
+        let saved = localStorage.getItem('darts_hybrid_v38');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -762,6 +750,42 @@ function resetAll() {
     if (confirm('すべての試合スコアを初期化しますか？（参加者やペアは残ります）')) {
         appState.matches = Array.from({length: 220}, () => ({ s1: null, s2: null }));
         appState.tournamentStarted = false; appState.updatedAt = Date.now(); saveLocal();
+    }
+}
+
+async function startAutoCloudSync() {
+    let badge = document.getElementById('sync_badge');
+    badge.innerText = '⬆️ サーバー準備中...'; badge.style.borderColor = '#f39c12';
+
+    try {
+        appState.updatedAt = Date.now();
+        let req = await fetch("https://api.jsonbin.io/v3/b", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json", 
+                "X-Master-Key": JSONBIN_MASTER_KEY 
+            },
+            body: JSON.stringify(appState)
+        });
+        if (!req.ok) throw new Error("Bin creation failed");
+        
+        let res = await req.json();
+        jsonbinId = res.metadata.id;
+        localStorage.setItem('darts_jsonbin_id', jsonbinId);
+
+        badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71';
+        let baseUrl = window.location.href.split('?')[0].split('#')[0];
+        let url = `${baseUrl}?mode=mypage&bin=${jsonbinId}`;
+        
+        navigator.clipboard.writeText(url).then(() => { 
+            alert('✨ クラウド連携に成功しました！\n\n参加者用のマイページURLをコピーしました。\nこれをQRコードにして皆に共有してください。'); 
+        }).catch(() => { 
+            prompt('以下のURLをコピーしてQRコードにしてください:', url); 
+        });
+
+    } catch (e) {
+        badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c';
+        alert("サーバーエラーです。時間を置いてお試しください。");
     }
 }
 
@@ -774,8 +798,8 @@ async function pushCloudState() {
         let req = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}`, {
             method: 'PUT',
             headers: { 
-                'Content-Type': 'application/json',
-                'X-Master-Key': JSONBIN_MASTER_KEY
+                "Content-Type": "application/json",
+                "X-Master-Key": JSONBIN_MASTER_KEY 
             },
             body: JSON.stringify(appState)
         }); 
@@ -792,7 +816,7 @@ async function pushCloudState() {
 
 async function pullCloudState() {
     if (isSaving || !jsonbinId) {
-        if (document.getElementById('sync_badge')) {
+        if (document.getElementById('sync_badge') && currentMode === 'admin') {
             document.getElementById('sync_badge').innerText = '☁️ クラウド未設定';
             document.getElementById('sync_badge').style.borderColor = '#999';
         }
@@ -800,31 +824,24 @@ async function pullCloudState() {
     }
     try {
         let req = await fetch(`https://api.jsonbin.io/v3/b/${jsonbinId}/latest?meta=false`, {
-            headers: { 'X-Master-Key': JSONBIN_MASTER_KEY }
+            headers: { "X-Master-Key": JSONBIN_MASTER_KEY }
         });
         if (req.ok) {
             let remote = await req.json();
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v37', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v38', JSON.stringify(appState)); } catch(e){}
             }
-            if (document.getElementById('sync_badge')) {
+            if (document.getElementById('sync_badge') && currentMode === 'admin') {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
                 document.getElementById('sync_badge').style.borderColor = '#2ecc71';
             }
+        } else if (req.status === 404) {
+            jsonbinId = null;
+            localStorage.removeItem('darts_jsonbin_id');
         }
     } catch(e) {}
-}
-
-function copyRoomLink() {
-    let baseUrl = window.location.href.split('?')[0].split('#')[0];
-    if (!jsonbinId) {
-        alert("先に上の入力欄に、JSONBinのIDを貼り付けてください！"); return;
-    }
-    let url = `${baseUrl}?mode=mypage&bin=${jsonbinId}`;
-    navigator.clipboard.writeText(url).then(() => { alert('参加者用のマイページURLをコピーしました！\nこれをQRコードにして皆に共有してください。'); })
-    .catch(() => { prompt('以下のURLをコピーしてQRコードにしてください:', url); });
 }
 
 window.onload = async () => {
@@ -834,9 +851,9 @@ window.onload = async () => {
     
     pullCloudState();
     
-    // 💡 API節約設計：管理者は10秒、スマホの参加者(mypage)は60秒ごとに更新
-    let pollInterval = (currentMode === 'mypage' || currentMode === 'display') ? 60000 : 10000;
-    setInterval(pullCloudState, pollInterval); 
+    // 💡 ポップアップのテストがしやすいように、更新間隔を「10秒」に早めています！
+    // (本番ではAPI節約のためにもう少し長くする予定です)
+    setInterval(pullCloudState, 10000); 
 };
 </script>
 </body>

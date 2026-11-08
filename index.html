@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 DARTS TOURNAMENT BOARD (Auto Hybrid Sync)</title>
+    <title>🎯 DARTS TOURNAMENT BOARD (Hybrid Sync)</title>
     <style>
         :root { --primary: #121521; --dl3-color: #e94560; --dl2-color: #0097e6; --accent: #1e272e; --bg: #f1f3f6; --win-bg: #d4edda; --win-border: #28a745; --win-text: #155724; }
         * { box-sizing: border-box; }
@@ -89,6 +89,7 @@
     <span class="sync-badge" id="sync_badge">🔄 クラウド同期待機中</span>
 </div>
 
+<!-- ================= 1. ロビン進行ボード画面 ================= -->
 <div id="page_board" class="tab-page active">
     <div id="champ_banner" class="champion-banner"></div>
     <div class="machine-grid">
@@ -120,6 +121,7 @@
     </div>
 </div>
 
+<!-- ================= 2. トーナメント ================= -->
 <div id="page_bracket" class="tab-page">
     <div class="card">
         <h2><span>🏆 決勝トーナメント（2LEG先取）</span><span id="bracket_lock_msg" style="font-size:0.8rem; font-weight:bold;"></span></h2>
@@ -127,6 +129,7 @@
     </div>
 </div>
 
+<!-- ================= 3. マイページ ================= -->
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
@@ -139,6 +142,7 @@
     </div>
 </div>
 
+<!-- ================= 4. 結果入力画面 ================= -->
 <div id="page_input" class="tab-page">
     <div style="text-align:center; margin-bottom:10px;">
         <h2 style="display:inline-block; border:none; margin:0;">🎯 試合結果の入力</h2>
@@ -158,6 +162,7 @@
     </div>
 </div>
 
+<!-- ================= 5. 設定タブ（鍵の手動登録機能つき） ================= -->
 <div id="page_setup" class="tab-page">
     <div class="card">
         <h2>⚙️ 参加者一覧 ＆ ペア振り分け</h2>
@@ -177,12 +182,19 @@
             <div><h3 style="color:var(--dl2-color); margin:0 0 6px 0;" id="setup_title_B">Bロビン ペア構成</h3><table class="robin-table"><tbody id="setup_B"></tbody></table></div>
         </div>
     </div>
+    
     <div class="card" style="text-align:center;">
-        <div style="margin-bottom:15px; text-align:left;">
-            <label style="font-weight:bold; font-size:0.82rem;">📱 参加者スマホ展開用URLの準備:</label>
-            <p style="font-size:0.75rem; color:#666; margin-top:4px;">※下のボタンを押すと、現在のクラウドデータに繋がる「合鍵付き」の専用URLがコピーされます。</p>
+        <div style="margin-bottom:15px; text-align:left; background:#e8f4f8; padding:12px; border-radius:8px;">
+            <label style="font-weight:bold; font-size:0.85rem; color:#0f3460;">① まず無料クラウドで「箱」を作ります</label>
+            <p style="font-size:0.75rem; color:#333; margin:4px 0 10px 0;">
+                <a href="https://kvdb.io/" target="_blank" style="color:#e94560; font-weight:bold; text-decoration:underline;">https://kvdb.io/</a>
+                を開き、画面に大きく表示された英数字（例: Wk3...）をコピーしてください。（1クリックで終わります）
+            </p>
+            <label style="font-weight:bold; font-size:0.85rem; color:#0f3460;">② コピーした鍵（バケットID）をここに貼り付け:</label>
+            <input type="text" id="bucket_id_input" placeholder="ここに貼り付け..." style="margin-top:4px; padding:10px; font-weight:bold; text-align:left; border:2px solid #0f3460; width:100%;" onchange="changeBucketId(this.value)">
         </div>
-        <button class="tab-btn" style="background:#28a745; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="copyRoomLink()">🔗 参加者スマホ閲覧用URL（マイページ）をコピー</button>
+
+        <button class="tab-btn" style="background:#28a745; width:100%; padding:12px; margin-bottom:15px; font-size:0.95rem;" onclick="copyRoomLink()">🔗 ③ 参加者スマホ閲覧用URL（マイページ）をコピー</button>
         <button class="tab-btn" style="background:#8e44ad; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="unlockRobin()">🔁 トーナメントを一時中断してロビンを再修正する</button>
         <button class="tab-btn" style="background:#c0392b; width:100%; padding:10px; font-size:0.9rem;" onclick="resetAll()">⚠️ すべての試合スコアを初期化する</button>
     </div>
@@ -190,10 +202,9 @@
 
 <script>
 let currentMode = "admin";
-let roomId = "fumi-darts-live";
 let isSaving = false;
-let kvdbBucket = null; // APIキー不要！自動生成される保存箱の合鍵
-
+let kvdbBucket = ""; 
+const DATA_KEY = "darts_tourney_data";
 const T_QF1 = 200, T_QF2 = 201, T_SF1 = 202, T_SF2 = 203, T_3RD = 204, T_FINAL = 205;
 
 // === 🔔 通知とWeb Audio ===
@@ -229,7 +240,6 @@ function triggerNotification(title, body, matchId, type) {
     if (notificationAllowed) playBeep();
     if (notificationAllowed && Notification.permission === 'granted') { try { new Notification(title, { body: body, icon: '🎯' }); } catch(e) {} }
 }
-// ==============================
 
 function getRobinScheduleForCount(teamCount) {
     if (teamCount <= 1) return [];
@@ -345,7 +355,6 @@ function renderBoardMachineCards(dl3Pending, dl2Pending) {
 function renderIntegratedRobin(blk, st) {
     let pCount = appState.pairs[blk].length, baseIdx = blk === 'A' ? 0 : 100, map = {};
     st.rSched.forEach((p, r) => { let sc = appState.matches[baseIdx + r]; map[`${p[0]}-${p[1]}`] = sc; map[`${p[1]}-${p[0]}`] = sc ? { s1: sc.s2, s2: sc.s1 } : null; });
-
     document.getElementById('title_robin_' + blk).innerText = `📊 ${blk}ロビン 順位表（${pCount}組）`;
     let html = `<table class="robin-table"><thead><tr><th>ペア名</th>`;
     for (let i = 0; i < pCount; i++) html += `<th class="col-code">${blk}${i+1}</th>`;
@@ -365,7 +374,7 @@ function renderIntegratedRobin(blk, st) {
         let isTop3 = typeof rowStat.rank === 'number' && rowStat.rank <= 3;
         html += `<td style="font-weight:bold;">${rowStat.matchesPlayed>0?rowStat.win:'-'}</td><td>${rowStat.matchesPlayed>0?rowStat.lose:'-'}</td><td>${rowStat.matchesPlayed>0?rowStat.lf:'-'}</td><td>${rowStat.matchesPlayed>0?rowStat.la:'-'}</td><td>${rowStat.matchesPlayed>0?(rowStat.diff>0?'+'+rowStat.diff:rowStat.diff):'-'}</td><td class="${isTop3?'rank-qualify':''}">${rankDisplay}${isTop3?'🎯':''}</td></tr>`;
     });
-    html += `</tbody></table><div class="tiebreak-note">※同率時: 1.勝 2.得L 3.失L 4.直接対決 5.CU</div>`;
+    html += `</tbody></table>`;
     document.getElementById('robin_' + blk).innerHTML = html;
 }
 
@@ -375,7 +384,7 @@ function renderMountainBracket(metaObj, isUnlocked) {
     let isDone = idx => sc(idx).s1 !== null, winSide = idx => isDone(idx) ? (sc(idx).s1 > sc(idx).s2 ? 1 : 2) : 0;
     let msgEl = document.getElementById('bracket_lock_msg');
     if (isUnlocked) { msgEl.innerText = "※枠をクリックすると結果入力ができます"; msgEl.style.color = "#27ae60"; }
-    else { msgEl.innerText = "※ロビン全試合完了と本部の確定までロックされています"; msgEl.style.color = "#e94560"; }
+    else { msgEl.innerText = "※ロビン完了と本部の確定までロックされています"; msgEl.style.color = "#e94560"; }
     let lineStyle = active => active ? `stroke="#e94560" stroke-width="3.5" fill="none" stroke-linecap="square"` : `stroke="#94a3b8" stroke-width="2.5" fill="none" stroke-linecap="square"`;
 
     let mNodeHtml = (mIdx, leftPx, topPx, label) => {
@@ -418,8 +427,8 @@ function renderMountainBracket(metaObj, isUnlocked) {
 
             ${mNodeHtml(T_QF1, 305, 145, '準々決勝①')}
             ${mNodeHtml(T_QF2, 305, 345, '準々決勝②')}
-            ${mNodeHtml(T_SF1, 565, 79, '準決勝① (A1登場)')}
-            ${mNodeHtml(T_SF2, 565, 411, '準決勝② (B1登場)')}
+            ${mNodeHtml(T_SF1, 565, 79, '準決勝①')}
+            ${mNodeHtml(T_SF2, 565, 411, '準決勝②')}
             ${mNodeHtml(T_FINAL, 820, 245, '👑 優勝決定戦')}
             <div style="position:absolute; left:820px; top:442px; font-size:0.75rem; font-weight:bold; color:#666;">▼ 準決勝敗者による3位決定戦</div>
             ${mNodeHtml(T_3RD, 820, 462, '🥉 3位決定戦')}
@@ -660,15 +669,22 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v30' && e.newValue) {
+    if (e.key === 'darts_hybrid_v31' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
 });
 
+// 手動入力されたバケットIDを保存＆反映する関数
+function changeBucketId(val) {
+    kvdbBucket = val.trim();
+    localStorage.setItem('darts_manual_bucket', kvdbBucket);
+    pullCloudState();
+}
+
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v30', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v31', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -687,16 +703,19 @@ function loadLocal() {
         }
     }
     
-    // 🔥 URLから合鍵（bin ID）を受け取る
+    // URLから合鍵（bin ID）を受け取る
     if (params.get('bin')) {
         kvdbBucket = params.get('bin');
-        localStorage.setItem('darts_bucket_id', kvdbBucket);
     } else {
-        kvdbBucket = localStorage.getItem('darts_bucket_id');
+        kvdbBucket = localStorage.getItem('darts_manual_bucket') || "";
+    }
+
+    if (document.getElementById('bucket_id_input')) {
+        document.getElementById('bucket_id_input').value = kvdbBucket;
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v30');
+        let saved = localStorage.getItem('darts_hybrid_v31');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -708,37 +727,16 @@ function resetAll() {
     }
 }
 
-// ☁️ 新しい超安定クラウド通信（APIキー不要・自動生成＆自動復旧）
-async function getOrCreateBucket() {
-    if (kvdbBucket) return; 
-    try {
-        let req = await fetch("https://kvdb.io/", { method: "POST" });
-        if (req.ok) {
-            kvdbBucket = await req.text();
-            localStorage.setItem(`darts_bucket_id`, kvdbBucket);
-        }
-    } catch(e) {}
-}
-
 async function pushCloudState() {
     if (isSaving || !kvdbBucket) return;
     isSaving = true;
     let badge = document.getElementById('sync_badge');
-    badge.innerText = '⬆️ クラウド送信中...'; badge.style.borderColor = '#f39c12';
+    badge.innerText = '⬆️ 送信中...'; badge.style.borderColor = '#f39c12';
     try { 
-        let req = await fetch(`https://kvdb.io/${kvdbBucket}/${encodeURIComponent(roomId)}`, {
+        let req = await fetch(`https://kvdb.io/${kvdbBucket}/${DATA_KEY}`, {
             method: 'PUT',
             body: JSON.stringify(appState)
         }); 
-        if (req.status === 404) {
-            // クラウドの箱が期限切れで消滅していた場合、自動で作り直して再送信
-            kvdbBucket = null;
-            localStorage.removeItem('darts_bucket_id');
-            isSaving = false;
-            await getOrCreateBucket();
-            await pushCloudState();
-            return;
-        }
         if (req.ok) { badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71'; }
         else { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
     } catch(e) { badge.innerText = '⚠️ 通信エラー'; badge.style.borderColor = '#e74c3c'; }
@@ -746,34 +744,34 @@ async function pushCloudState() {
 }
 
 async function pullCloudState() {
-    if (isSaving || !kvdbBucket) return;
+    if (isSaving || !kvdbBucket) {
+        document.getElementById('sync_badge').innerText = '☁️ クラウド未設定';
+        document.getElementById('sync_badge').style.borderColor = '#999';
+        return;
+    }
     try {
-        let req = await fetch(`https://kvdb.io/${kvdbBucket}/${encodeURIComponent(roomId)}?t=${Date.now()}`);
+        let req = await fetch(`https://kvdb.io/${kvdbBucket}/${DATA_KEY}?t=${Date.now()}`);
         if (req.ok) {
             let remote = await req.json();
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v30', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v31', JSON.stringify(appState)); } catch(e){}
             }
+            document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
+            document.getElementById('sync_badge').style.borderColor = '#2ecc71';
         }
     } catch(e) {}
 }
 
-// 🔥 URLに「合鍵（bin ID）」を含めてコピーする
 function copyRoomLink() {
     let baseUrl = window.location.href.split('?')[0].split('#')[0];
     if (!kvdbBucket) {
-        alert("まだ通信回線が確保されていません。\n1〜2秒待ってからもう一度押してください。"); return;
+        alert("先に上の入力欄に、KVDBの鍵（バケットID）を貼り付けてください！"); return;
     }
-    let url = `${baseUrl}?mode=mypage&room=${encodeURIComponent(roomId)}&bin=${kvdbBucket}`;
+    let url = `${baseUrl}?mode=mypage&bin=${kvdbBucket}`;
     navigator.clipboard.writeText(url).then(() => { alert('参加者用のマイページURLをコピーしました！\nこれをQRコードにして皆に共有してください。'); })
     .catch(() => { prompt('以下のURLをコピーしてQRコードにしてください:', url); });
-}
-
-async function initCloud() {
-    if (currentMode !== 'mypage') await getOrCreateBucket(); 
-    if (kvdbBucket) pullCloudState();
 }
 
 window.onload = async () => {
@@ -781,7 +779,7 @@ window.onload = async () => {
     if (currentMode === 'input') showTab('input');
     if (currentMode === 'mypage') showTab('mypage'); 
     
-    await initCloud();
+    pullCloudState();
     setInterval(pullCloudState, 4000); 
 };
 </script>

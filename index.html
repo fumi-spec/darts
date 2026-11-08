@@ -669,7 +669,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v34' && e.newValue) {
+    if (e.key === 'darts_hybrid_v35' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -683,7 +683,7 @@ function changeBucketId(val) {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v34', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v35', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -713,7 +713,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v34');
+        let saved = localStorage.getItem('darts_hybrid_v35');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -731,10 +731,9 @@ async function pushCloudState() {
     let badge = document.getElementById('sync_badge');
     if(badge) { badge.innerText = '⬆️ 送信中...'; badge.style.borderColor = '#f39c12'; }
     try { 
-        // 修正ポイント：ヘッダーに 'Content-Type': 'application/json' を追加
+        // 💡 変更点：PUT ではなく POST を使い、余計なHeaderを消してブラウザのセキュリティブロックを回避する
         let req = await fetch(`https://kvdb.io/${kvdbBucket}/${DATA_KEY}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
             body: JSON.stringify(appState)
         }); 
         if (req.ok) { 
@@ -763,7 +762,7 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v34', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v35', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge')) {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 

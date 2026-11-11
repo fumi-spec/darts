@@ -36,9 +36,6 @@
         .cell-win { background: #eafaf1; font-weight: bold; color: #155724; }
         .cell-lose { background: #fdedec; color: #721c24; }
         .rank-qualify { background: #fff9db; font-weight: bold; color: #b7791f; }
-        .tiebreak-note { font-size: 0.72rem; color: #666; margin-top: 6px; line-height: 1.3; }
-        .tr-now { background-color: #fff9db !important; border: 2px solid #f1c40f; }
-        .badge-now { display: inline-block; background: #e74c3c; color: #fff; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
         .mountain-scroll { overflow-x: auto; padding: 10px 4px; }
         .mountain-canvas { position: relative; width: 1040px; height: 600px; margin: 0 auto; background: #fafbfc; border: 1px solid #e2e8f0; border-radius: 10px; }
         .mountain-svg { position: absolute; top: 0; left: 0; width: 1040px; height: 600px; z-index: 1; pointer-events: none; }
@@ -98,7 +95,7 @@
     <span class="sync-badge" id="sync_badge" style="background:rgba(255,255,255,0.2); border-color:#ccc; color:#fff;">☁️ クラウド未接続</span>
 </div>
 
-<!-- ================= 1. ロビン進行ボード画面（モニター用・特大レイアウト） ================= -->
+<!-- ================= 1. ロビン進行ボード画面 ================= -->
 <div id="page_board" class="tab-page active">
     <div id="champ_banner" class="champion-banner"></div>
     <div class="machine-grid">
@@ -125,7 +122,7 @@
     </div>
 </div>
 
-<!-- ================= 3. マイページ（参加者用・完全手動同期でAPI消費ゼロ） ================= -->
+<!-- ================= 3. マイページ ================= -->
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
@@ -147,9 +144,7 @@
         <h2 style="display:inline-block; border:none; margin:0;">🎯 試合結果の入力</h2>
         <p style="font-size:0.8rem; color:#555; margin:2px 0 0 0;" id="input_desc_msg">いま行われている試合だけが表示されています。</p>
     </div>
-    <div id="active_input_area">
-        <div class="active-input-grid"><div class="live-input-card" id="active_box_dl3"></div><div class="live-input-card dl2" id="active_box_dl2"></div></div>
-    </div>
+    <div id="active_input_area"></div>
     <div class="card" style="max-width:960px; margin:0 auto;">
         <details>
             <summary style="cursor:pointer; font-weight:bold; color:#555; padding:4px 0;">✏️ 終了した試合のスコアを修正する</summary>
@@ -190,7 +185,7 @@
         </div>
 
         <button class="tab-btn" style="background:#8e44ad; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="unlockRobin()">🔁 トーナメントを一時中断してロビンを再修正する</button>
-        <button class="tab-btn" style="background:#c0392b; width:100%; padding:10px; margin-bottom:15px; font-size:0.9rem;" onclick="resetAll()">⚠️ すべての試合スコアを初期化する</button>
+        <button class="tab-btn" style="background:#c0392b; width:100%; padding:10px; font-size:0.9rem;" onclick="resetAll()">⚠️ すべての試合スコアを初期化する</button>
     </div>
 </div>
 
@@ -283,7 +278,7 @@ function sortRobinStatsWithTiebreak(stats, map) {
 
 function calcRobinStats(blk) {
     ensureMatchesLength();
-    let pairs = appState.pairs[blk], pCount = pairs.length;
+    let pairs = appState.pairs[blk] || [], pCount = pairs.length;
     let rSched = getRobinScheduleForCount(pCount), matchesPerTeam = pCount > 0 ? pCount - 1 : 0;
     let baseIdx = blk === 'A' ? 0 : 100, stats = pairs.map((pr, i) => ({ idx: i, code: `${blk}${i+1}`, short: getPairShort(blk, i), win: 0, lose: 0, lf: 0, la: 0, diff: 0, matchesPlayed: 0, rank: '-' }));
     let map = {};
@@ -356,7 +351,7 @@ function renderBoardMachineCards(dl3Pending, dl2Pending) {
 }
 
 function renderIntegratedRobin(blk, st) {
-    let pCount = appState.pairs[blk].length, baseIdx = blk === 'A' ? 0 : 100, map = {};
+    let pCount = (appState.pairs[blk] || []).length, baseIdx = blk === 'A' ? 0 : 100, map = {};
     st.rSched.forEach((p, r) => { let sc = appState.matches[baseIdx + r]; map[`${p[0]}-${p[1]}`] = sc; map[`${p[1]}-${p[0]}`] = sc ? { s1: sc.s2, s2: sc.s1 } : null; });
     document.getElementById('title_robin_' + blk).innerText = `📊 ${blk}ロビン 順位表（${pCount}組）`;
     let html = `<table class="robin-table"><thead><tr><th>ペア名</th>`;
@@ -443,7 +438,7 @@ function renderMountainBracket(metaObj, isUnlocked) {
 function updateMyPageSelect() {
     let sel = document.getElementById('mypage_select'), cur = sel.value;
     let html = `<option value="">▼ 自分のペアを選択してください</option>`;
-    ['A', 'B'].forEach(blk => { appState.pairs[blk].forEach((pr, i) => { html += `<option value="${blk}${i+1}">${blk}${i+1}: ${pr.p1}・${pr.p2}</option>`; }); });
+    ['A', 'B'].forEach(blk => { (appState.pairs[blk] || []).forEach((pr, i) => { html += `<option value="${blk}${i+1}">${blk}${i+1}: ${pr.p1}・${pr.p2}</option>`; }); });
     sel.innerHTML = html;
     if (cur) sel.value = cur;
 }
@@ -453,7 +448,7 @@ function renderMyPage() {
     if (!pairCode) { content.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">ペアを選択するとスケジュールが表示されます。</div>`; return; }
 
     let pairObj = null, blk = pairCode.charAt(0), idx = parseInt(pairCode.substring(1)) - 1;
-    if(blk && !isNaN(idx)) pairObj = appState.pairs[blk][idx];
+    if(blk && !isNaN(idx) && appState.pairs[blk]) pairObj = appState.pairs[blk][idx];
     let pairShortName = pairObj ? `${pairObj.p1}・${pairObj.p2}` : '';
     let stA = calcRobinStats('A'), stB = calcRobinStats('B'), metaList = getAllMatchesMeta(stA, stB).list, tStarted = appState.tournamentStarted;
     
@@ -500,10 +495,12 @@ function renderMyPage() {
     content.innerHTML = html;
 }
 
-// 💥 【重要修正】決勝トーナメントも含めて「選手名（チーム名）」で選択できるように変更！
 function renderActiveInputCards(dl3List, dl2List, robinFinished, tStarted) {
+    let container = document.getElementById('active_input_area');
+    if (!container) return;
+
     if (robinFinished && !tStarted) {
-        document.getElementById('active_input_area').innerHTML = `
+        container.innerHTML = `
             <div class="confirm-box">
                 <h2 style="color:#e67e22; border:none; justify-content:center; margin-bottom:10px;">✅ 予選ロビン 全試合完了！</h2>
                 <p style="font-size:1rem; font-weight:bold; color:#444; margin-bottom:20px;">順位を確定して決勝トーナメントを開始してください。<br><span style="color:#e74c3c; font-size:0.85rem;">※開始するとロビンのスコアはロックされます。</span></p>
@@ -513,7 +510,7 @@ function renderActiveInputCards(dl3List, dl2List, robinFinished, tStarted) {
         return;
     }
     let buildCard = (machineName, isDl2, currentMatch) => {
-        if (!currentMatch) return `<div class="live-input-card ${isDl2?'dl2':''}" style="text-align:center; padding:30px 10px;"><h3 style="color:#27ae60;">🎉 全試合完了！</h3></div>`;
+        if (!currentMatch) return `<div class="live-input-card ${isDl2?'dl2':''}" style="text-align:center; padding:30px 10px;"><h3 style="color:#28a745;">🎉 全試合完了！</h3></div>`;
         let mIdx = currentMatch.mIdx;
         let leftName = currentMatch.t1, rightName = currentMatch.t2;
         let leftLabel = currentMatch.c1 ? `[${currentMatch.c1}] ${leftName}` : leftName;
@@ -532,7 +529,7 @@ function renderActiveInputCards(dl3List, dl2List, robinFinished, tStarted) {
             </div>
         `;
     };
-    document.getElementById('active_input_area').innerHTML = `<div class="active-input-grid">${buildCard('DARTSLIVE3', false, dl3List[0])}${buildCard('DARTSLIVE2', true, dl2List[0])}</div>`;
+    container.innerHTML = `<div class="active-input-grid">${buildCard('DARTSLIVE3', false, dl3List[0])}${buildCard('DARTSLIVE2', true, dl2List[0])}</div>`;
 }
 
 function renderManualFixBox() {
@@ -559,10 +556,7 @@ function openManualFix(mIdx) {
     if (mIdx < 200 && appState.tournamentStarted) { alert('トーナメント開始後はロックされています。設定タブから解除してください。'); return; }
     if (mIdx >= 200 && !appState.tournamentStarted) { alert('本部の確定ボタンが押されるまで入力できません！'); return; }
     document.getElementById('manual_match_select').value = mIdx;
-    document.querySelectorAll('.top-nav .tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('nav_input').classList.add('active');
-    ['board','bracket','mypage','input','setup'].forEach(p => document.getElementById('page_' + p).classList.remove('active'));
-    document.getElementById('page_input').classList.add('active');
+    showTab('input');
     renderManualFixBox();
 }
 
@@ -580,6 +574,9 @@ function renderAll() {
     let dl3Pending = metaList.filter(m => m.machine === 'DARTSLIVE3' && pendingFilter(m));
     let dl2Pending = metaList.filter(m => m.machine === 'DARTSLIVE2' && pendingFilter(m));
     renderBoardMachineCards(dl3Pending, dl2Pending);
+
+    // 🔥 結果入力画面のリアルタイム再描画を確実に実行
+    renderActiveInputCards(dl3Pending, dl2Pending, robinFinished, tStarted);
 
     updateMyPageSelect();
     if(document.getElementById('page_mypage').classList.contains('active')) renderMyPage();
@@ -611,10 +608,11 @@ function updateRoster(i, field, val) {
 }
 
 function renderSetupPairs() {
-    document.getElementById('setup_title_A').innerText = `Aロビン ペア構成 (DARTSLIVE3：${appState.pairs.A.length}組)`;
-    document.getElementById('setup_title_B').innerText = `Bロビン ペア構成 (DARTSLIVE2：${appState.pairs.B.length}組)`;
+    let pA = appState.pairs.A || [], pB = appState.pairs.B || [];
+    document.getElementById('setup_title_A').innerText = `Aロビン ペア構成 (DARTSLIVE3：${pA.length}組)`;
+    document.getElementById('setup_title_B').innerText = `Bロビン ペア構成 (DARTSLIVE2：${pB.length}組)`;
     ['A','B'].forEach(blk => {
-        document.getElementById('setup_' + blk).innerHTML = appState.pairs[blk].map((pr, i) => `<tr><td><strong>${blk}${i+1}</strong></td><td>${pr.p1} ＆ ${pr.p2}</td><td style="font-weight:bold; color:var(--accent);">${((parseFloat(pr.rt1)||0)+(parseFloat(pr.rt2)||0)).toFixed(1)}</td></tr>`).join('');
+        document.getElementById('setup_' + blk).innerHTML = (appState.pairs[blk] || []).map((pr, i) => `<tr><td><strong>${blk}${i+1}</strong></td><td>${pr.p1} ＆ ${pr.p2}</td><td style="font-weight:bold; color:var(--accent);">${((parseFloat(pr.rt1)||0)+(parseFloat(pr.rt2)||0)).toFixed(1)}</td></tr>`).join('');
     });
 }
 
@@ -641,15 +639,28 @@ function autoBalancePairsFromList() {
 }
 
 function showTab(page, btn) {
-    ['board','bracket','mypage','input','setup'].forEach(p => document.getElementById('page_' + p).classList.remove('active'));
+    ['board','bracket','mypage','input','setup'].forEach(p => {
+        let el = document.getElementById('page_' + p);
+        if (el) el.classList.remove('active');
+    });
     document.querySelectorAll('.top-nav .tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page_' + page).classList.add('active');
-    if (btn) btn.classList.add('active');
-    if (page === 'mypage') renderMyPage();
+    
+    let targetEl = document.getElementById('page_' + page);
+    if (targetEl) targetEl.classList.add('active');
+    
+    let activeBtn = btn || document.getElementById('nav_' + page);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // 🔥 タブを切り替えた瞬間に各ページの描画を確実に実行
+    if (page === 'input') {
+        renderAll();
+    } else if (page === 'mypage') {
+        renderMyPage();
+    }
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v40' && e.newValue) {
+    if (e.key === 'darts_hybrid_v41' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -657,7 +668,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v40', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v41', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -683,7 +694,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v40');
+        let saved = localStorage.getItem('darts_hybrid_v41');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -756,7 +767,6 @@ async function pushCloudState() {
     isSaving = false;
 }
 
-// 🔄 手動で最新情報を取得する関数（スマホのAPI消費をゼロにするキモ！）
 async function forcePull() {
     let btn = document.getElementById('force_pull_btn');
     if (btn) { btn.innerText = "🔄 取得中..."; btn.disabled = true; }
@@ -766,6 +776,8 @@ async function forcePull() {
 }
 
 async function pullCloudState() {
+    if (document.hidden) return;
+
     if (isSaving || !jsonbinId) {
         if (document.getElementById('sync_badge') && currentMode === 'admin') {
             document.getElementById('sync_badge').innerText = '☁️ クラウド未設定';
@@ -782,12 +794,15 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v40', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v41', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge') && currentMode === 'admin') {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
                 document.getElementById('sync_badge').style.borderColor = '#2ecc71';
             }
+        } else if (req.status === 404) {
+            jsonbinId = null;
+            localStorage.removeItem('darts_jsonbin_id');
         }
     } catch(e) {}
 }
@@ -799,7 +814,6 @@ window.onload = async () => {
     
     pullCloudState();
     
-    // 🛡️ 管理者用画面のみ15秒ごとに自動更新。スマホ(mypage)は完全手動（API消費ゼロ！）にして無限に使えるように防衛！
     if (currentMode === 'admin' || currentMode === 'input') {
         setInterval(pullCloudState, 15000); 
     }

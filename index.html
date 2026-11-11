@@ -71,12 +71,18 @@
         input[type="text"], input[type="number"] { width: 95%; padding: 5px; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
         .notify-btn { background: #e67e22; color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 1rem; cursor: pointer; box-shadow: 0 3px 8px rgba(230,126,34,0.3); margin-bottom: 10px; }
         
-        /* 🔥 全画面対戦ポップアップ（ボタンなし・自動フェード） */
+        /* 🔥 全画面対戦ポップアップ（縦並びスタック構成） */
         .match-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 13, 24, 0.96); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #fff; text-align: center; animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .pop-machine { font-size: 2.4rem; font-weight: bold; margin-bottom: 15px; padding: 8px 30px; border-radius: 40px; background: #fff; color: #121521; }
-        .pop-title { font-size: 2rem; color: #f1c40f; margin-bottom: 25px; font-weight: bold; }
-        .pop-opp { font-size: 3.2rem; font-weight: 900; background: #e94560; padding: 30px 24px; border-radius: 16px; margin-bottom: 25px; width: 100%; max-width: 760px; box-shadow: 0 12px 35px rgba(233,69,96,0.6); line-height: 1.3; }
+        .pop-machine { font-size: 2.2rem; font-weight: bold; margin-bottom: 10px; padding: 6px 28px; border-radius: 40px; background: #fff; color: #121521; }
+        .pop-title { font-size: 1.8rem; color: #f1c40f; margin-bottom: 20px; font-weight: bold; }
+        
+        .pop-stack-box { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; gap: 10px; }
+        .pop-team-card { width: 100%; background: #1f273f; border: 2px solid #3b4b72; border-left: 10px solid #e94560; border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; justify-content: center; gap: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .pop-team-card.team-b { border-left-color: #0097e6; }
+        .pop-team-code { background: #f39c12; color: #121521; font-weight: 900; font-size: 1.8rem; padding: 4px 14px; border-radius: 8px; white-space: nowrap; }
+        .pop-team-name { font-size: 2.4rem; font-weight: 900; color: #fff; letter-spacing: 1px; word-break: break-all; }
+        .pop-vs-divider { font-size: 2rem; font-weight: 900; color: #e74c3c; letter-spacing: 2px; text-shadow: 0 0 10px rgba(231,76,60,0.6); }
 
         /* 📺 会場モニター専用モード（mode=display）：深みのある紺（ネイビー）ベース */
         body.display-mode { padding: 16px; background: #0c101d; color: #f1f3f6; }
@@ -98,12 +104,21 @@
 </head>
 <body>
 
-<!-- 💥 自動ポップアップ -->
+<!-- 💥 モニター自動ポップアップ（縦並び配置） -->
 <div id="match_popup" class="match-popup">
     <div id="pop_machine" class="pop-machine">🎯 DARTSLIVE</div>
     <div id="pop_title" class="pop-title">試合が始まりました！</div>
-    <div style="font-size:1.3rem; margin-bottom:12px; color:#aaa; font-weight:bold;">▼ NEXT MATCH ▼</div>
-    <div id="pop_opp" class="pop-opp">対戦カード名</div>
+    <div class="pop-stack-box">
+        <div class="pop-team-card">
+            <span id="pop_t1_code" class="pop-team-code">A1</span>
+            <span id="pop_t1_name" class="pop-team-name">選手名 ＆ 選手名</span>
+        </div>
+        <div class="pop-vs-divider">VS</div>
+        <div class="pop-team-card team-b">
+            <span id="pop_t2_code" class="pop-team-code">A2</span>
+            <span id="pop_t2_name" class="pop-team-name">選手名 ＆ 選手名</span>
+        </div>
+    </div>
 </div>
 
 <div class="top-nav" id="main_nav">
@@ -142,7 +157,7 @@
     </div>
 </div>
 
-<!-- ================= 3. 参加者用確認（完全手動更新・API消費ゼロ） ================= -->
+<!-- ================= 3. 参加者用確認 ================= -->
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
         <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 試合スケジュール確認</h2>
@@ -233,10 +248,22 @@ function playBeep() {
     } catch(e) {}
 }
 
-function showMatchPopup(machine, title, cardName, autoCloseSec = 7) {
+function showMatchPopup(machine, title, t1Code, t1Name, t2Code, t2Name, autoCloseSec = 7) {
     document.getElementById('pop_machine').innerText = "🎯 " + machine;
     document.getElementById('pop_title').innerText = title + " 開始！";
-    document.getElementById('pop_opp').innerText = cardName;
+
+    let elCode1 = document.getElementById('pop_t1_code');
+    let elName1 = document.getElementById('pop_t1_name');
+    let elCode2 = document.getElementById('pop_t2_code');
+    let elName2 = document.getElementById('pop_t2_name');
+
+    if (t1Code) { elCode1.style.display = 'inline-block'; elCode1.innerText = t1Code; }
+    else { elCode1.style.display = 'none'; }
+    elName1.innerText = t1Name;
+
+    if (t2Code) { elCode2.style.display = 'inline-block'; elCode2.innerText = t2Code; }
+    else { elCode2.style.display = 'none'; }
+    elName2.innerText = t2Name;
 
     document.getElementById('match_popup').style.display = 'flex';
     playBeep();
@@ -268,9 +295,7 @@ function checkBoardPopup(dl3Now, dl2Now) {
     }
 
     if (targetMatch) {
-        let leftLabel = targetMatch.c1 ? `[${targetMatch.c1}] ${targetMatch.t1}` : targetMatch.t1;
-        let rightLabel = targetMatch.c2 ? `[${targetMatch.c2}] ${targetMatch.t2}` : targetMatch.t2;
-        showMatchPopup(targetMatch.machine, targetMatch.title, `${leftLabel} VS ${rightLabel}`, 7);
+        showMatchPopup(targetMatch.machine, targetMatch.title, targetMatch.c1 || '', targetMatch.t1, targetMatch.c2 || '', targetMatch.t2, 7);
     }
 
     lastActiveMatches.dl3 = dl3Now ? dl3Now.mIdx : null;
@@ -693,7 +718,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v44' && e.newValue) {
+    if (e.key === 'darts_hybrid_v45' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -701,7 +726,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v44', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v45', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -728,7 +753,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v44');
+        let saved = localStorage.getItem('darts_hybrid_v45');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -834,7 +859,7 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v44', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v45', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge') && currentMode === 'admin') {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
@@ -854,8 +879,6 @@ window.onload = async () => {
     
     pullCloudState();
     
-    // ⚡️ 本部Mac(admin)・モニター画面(display)は「3秒間隔」で超高速同期！
-    // 参加者スマホ(mypage)は自動更新しないのでAPIの無駄遣いはゼロ！
     if (currentMode === 'admin' || currentMode === 'display') {
         setInterval(pullCloudState, 3000); 
     }

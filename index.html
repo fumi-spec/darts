@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 DARTS TOURNAMENT BOARD (Pro Layout)</title>
+    <title>🎯 DARTS TOURNAMENT BOARD (Pro Live Sync)</title>
     <style>
         :root { --primary: #121521; --dl3-color: #e94560; --dl2-color: #0097e6; --accent: #1e272e; --bg: #f1f3f6; --win-bg: #d4edda; --win-border: #28a745; --win-text: #155724; }
         * { box-sizing: border-box; }
@@ -60,18 +60,18 @@
         .vs-banner { background: #f8f9fa; border-radius: 8px; padding: 12px; text-align: center; margin: 10px 0; border: 1px solid #e2e8f0; }
         .vs-teams { font-size: 1.15rem; font-weight: bold; color: var(--primary); line-height: 1.45; }
         .score-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .big-score-btn { padding: 12px 10px; border: 2px solid #cbd5e0; background: #fff; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.15s; }
+        .big-score-btn { padding: 14px 10px; border: 2px solid #cbd5e0; background: #fff; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.15s; }
         .big-score-btn:hover { border-color: var(--primary); background: #f8f9fa; }
         .big-score-btn.left-win { border-left: 6px solid var(--dl3-color); }
         .big-score-btn.right-win { border-left: 6px solid var(--dl2-color); }
-        .big-score-btn .who-win { font-size: 0.85rem; font-weight: bold; color: #333; margin-bottom: 2px; }
-        .big-score-btn .leg-num { font-size: 1.25rem; font-weight: bold; color: var(--primary); }
+        .big-score-btn .who-win { font-size: 0.9rem; font-weight: bold; color: #333; margin-bottom: 3px; }
+        .big-score-btn .leg-num { font-size: 1.35rem; font-weight: bold; color: var(--primary); }
         .confirm-box { background: #fffdf0; border: 2px solid #f1c40f; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
         .champion-banner { background: linear-gradient(135deg, #ffd700, #ffae00); color: #121521; font-weight: bold; text-align: center; padding: 14px; border-radius: 8px; font-size: 1.25rem; margin-bottom: 10px; display: none; box-shadow: 0 3px 10px rgba(255, 174, 0, 0.4); }
         input[type="text"], input[type="number"] { width: 95%; padding: 5px; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
         .notify-btn { background: #e67e22; color: #fff; font-weight: bold; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 1rem; cursor: pointer; box-shadow: 0 3px 8px rgba(230,126,34,0.3); margin-bottom: 10px; }
         
-        /* 🔥 全画面対戦ポップアップ（ボタン撤去・完全自動） */
+        /* 🔥 全画面対戦ポップアップ（ボタンなし・自動フェード） */
         .match-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 13, 24, 0.96); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #fff; text-align: center; animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .pop-machine { font-size: 2.4rem; font-weight: bold; margin-bottom: 15px; padding: 8px 30px; border-radius: 40px; background: #fff; color: #121521; }
@@ -98,7 +98,7 @@
 </head>
 <body>
 
-<!-- 💥 モニター自動ポップアップ（ボタンなし・自動フェード） -->
+<!-- 💥 自動ポップアップ -->
 <div id="match_popup" class="match-popup">
     <div id="pop_machine" class="pop-machine">🎯 DARTSLIVE</div>
     <div id="pop_title" class="pop-title">試合が始まりました！</div>
@@ -109,7 +109,7 @@
 <div class="top-nav" id="main_nav">
     <button class="tab-btn active" id="nav_board" onclick="showTab('board', this)">📺 進行ボード</button>
     <button class="tab-btn" id="nav_bracket" onclick="showTab('bracket', this)">🏆 トーナメント</button>
-    <button class="tab-btn" id="nav_mypage" onclick="showTab('mypage', this)">📱 出番確認(通知機能)</button>
+    <button class="tab-btn" id="nav_mypage" onclick="showTab('mypage', this)">📱 参加者用確認</button>
     <button class="tab-btn" id="nav_input" onclick="showTab('input', this)">🎯 結果入力</button>
     <button class="tab-btn" id="nav_setup" onclick="showTab('setup', this)">⚙️ 設定</button>
     <span class="sync-badge" id="sync_badge" style="background:rgba(255,255,255,0.2); border-color:#ccc; color:#fff;">☁️ クラウド未接続</span>
@@ -142,14 +142,13 @@
     </div>
 </div>
 
-<!-- ================= 3. マイページ ================= -->
+<!-- ================= 3. 参加者用確認（完全手動更新・API消費ゼロ） ================= -->
 <div id="page_mypage" class="tab-page">
     <div class="card" style="max-width:800px; margin:0 auto; padding:20px;">
-        <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 自分の試合スケジュール確認</h2>
-        <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※下のボタンを押すと、いつでも最新の対戦状況に更新できます。</p>
+        <h2 style="text-align:center; border:none; color:var(--primary); margin-bottom:5px; font-size:1.2rem;">📱 試合スケジュール確認</h2>
+        <p style="text-align:center; font-size:0.85rem; color:#666; margin-top:0; margin-bottom:15px;">※会場のモニターをご確認いただくか、下のボタンで更新してください。</p>
         
-        <button id="notify_btn" class="notify-btn" onclick="requestNotificationPermission()">🔔 アラーム音をオンにする</button>
-        <button id="force_pull_btn" class="notify-btn" style="background:#27ae60; font-size:1.1rem; padding:16px; margin-bottom:20px;" onclick="forcePull()">🔄 最新の状況にアップデートする</button>
+        <button id="force_pull_btn" class="notify-btn" style="background:#27ae60; font-size:1.1rem; padding:16px; margin-bottom:20px;" onclick="forcePull()">🔄 最新の状況を手動で取得する</button>
 
         <select id="mypage_select" style="width:100%; padding:14px; font-size:1.1rem; margin-bottom:15px; border:2px solid var(--accent); border-radius:8px; font-weight:bold;" onchange="renderMyPage()">
             <option value="">▼ 自分のペアを選択してください</option>
@@ -158,11 +157,11 @@
     </div>
 </div>
 
-<!-- ================= 4. 結果入力画面 ================= -->
+<!-- ================= 4. 結果入力画面（iPad用） ================= -->
 <div id="page_input" class="tab-page">
     <div style="text-align:center; margin-bottom:10px;">
         <h2 style="display:inline-block; border:none; margin:0;">🎯 試合結果の入力</h2>
-        <p style="font-size:0.8rem; color:#555; margin:2px 0 0 0;" id="input_desc_msg">いま行われている試合だけが表示されています。</p>
+        <p style="font-size:0.85rem; color:#555; margin:2px 0 0 0;" id="input_desc_msg">いま行われている試合だけが表示されています。</p>
     </div>
     <div id="active_input_area"></div>
     <div class="card" style="max-width:960px; margin:0 auto;">
@@ -200,7 +199,7 @@
     <div class="card" style="text-align:center;">
         <div style="margin-bottom:15px; text-align:left; background:#fffdf0; padding:15px; border-radius:8px; border: 2px solid #f1c40f;">
             <h3 style="margin-top:0; color:#d35400; font-size:1.05rem;">🌐 クラウド連携 ＆ 専用画面</h3>
-            <button class="tab-btn" style="background:#e67e22; width:100%; padding:14px; font-size:1.1rem; margin-bottom:10px; box-shadow:0 4px 10px rgba(230,126,34,0.3);" onclick="startAutoCloudSync()">🚀 スマホと連携スタート ＆ URLコピー</button>
+            <button class="tab-btn" style="background:#e67e22; width:100%; padding:14px; font-size:1.1rem; margin-bottom:10px; box-shadow:0 4px 10px rgba(230,126,34,0.3);" onclick="startAutoCloudSync()">🚀 クラウド連携スタート ＆ iPad用URLコピー</button>
             <button class="tab-btn" style="background:#1e3799; width:100%; padding:14px; font-size:1.05rem;" onclick="openDisplayMode()">📺 会場モニター専用フルスクリーンを開く</button>
         </div>
 
@@ -218,9 +217,7 @@ const JSONBIN_MASTER_KEY = "$2a$10$IaBXHSU6t2akxvJkSmkwwOpoel3zvxStuedU4ZxJ2xyz1
 const T_QF1 = 200, T_QF2 = 201, T_SF1 = 202, T_SF2 = 203, T_3RD = 204, T_FINAL = 205;
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-let notificationAllowed = false;
 let isFirstLoad = true;
-let notifiedMatches = {}; 
 let popupTimer = null;
 let lastActiveMatches = { dl3: null, dl2: null };
 
@@ -236,21 +233,13 @@ function playBeep() {
     } catch(e) {}
 }
 
-function requestNotificationPermission() {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    playBeep(); 
-    notificationAllowed = true;
-    document.getElementById('notify_btn').style.display = 'none';
-    alert("アラーム音をオンにしました！");
-}
-
 function showMatchPopup(machine, title, cardName, autoCloseSec = 7) {
     document.getElementById('pop_machine').innerText = "🎯 " + machine;
     document.getElementById('pop_title').innerText = title + " 開始！";
     document.getElementById('pop_opp').innerText = cardName;
 
     document.getElementById('match_popup').style.display = 'flex';
-    if (notificationAllowed) playBeep();
+    playBeep();
 
     if (popupTimer) clearTimeout(popupTimer);
     if (autoCloseSec > 0) {
@@ -261,13 +250,6 @@ function showMatchPopup(machine, title, cardName, autoCloseSec = 7) {
 function closePopup() { 
     document.getElementById('match_popup').style.display = 'none'; 
     if (popupTimer) clearTimeout(popupTimer);
-}
-
-function triggerNotification(matchId, machine, mTitle, opp) {
-    let key = `${matchId}_now`;
-    if (notifiedMatches[key] || isFirstLoad) return; 
-    notifiedMatches[key] = true;
-    if (currentMode === 'mypage') showMatchPopup(machine, mTitle, opp, 7);
 }
 
 function checkBoardPopup(dl3Now, dl2Now) {
@@ -529,7 +511,6 @@ function renderMyPage() {
         } else if (isNow) { 
             statusHtml = `<span style="background:#e74c3c; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">🔥 試合中 (マシンへ！)</span>`; 
             cardStyle = 'background:#fff5f5; border:2px solid #e74c3c;';
-            triggerNotification(m.mIdx, m.machine, m.title, opp);
         } else if (isNext) { 
             statusHtml = `<span style="background:#f39c12; color:#fff; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:bold;">⚠️ 次の準備</span>`; 
             cardStyle = 'background:#fffdf0; border:2px solid #f1c40f;';
@@ -712,7 +693,7 @@ function showTab(page, btn) {
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'darts_hybrid_v43' && e.newValue) {
+    if (e.key === 'darts_hybrid_v44' && e.newValue) {
         appState = JSON.parse(e.newValue);
         ensureMatchesLength(); renderRosterInputs(); renderAll();
     }
@@ -720,7 +701,7 @@ window.addEventListener('storage', (e) => {
 
 function saveLocal() {
     try {
-        localStorage.setItem('darts_hybrid_v43', JSON.stringify(appState));
+        localStorage.setItem('darts_hybrid_v44', JSON.stringify(appState));
         renderRosterInputs(); renderAll();
         if (currentMode === 'admin' || currentMode === 'input') pushCloudState();
     } catch(e) {}
@@ -747,7 +728,7 @@ function loadLocal() {
     }
 
     try {
-        let saved = localStorage.getItem('darts_hybrid_v43');
+        let saved = localStorage.getItem('darts_hybrid_v44');
         if (saved) { appState = JSON.parse(saved); ensureMatchesLength(); }
     } catch(e) {}
 }
@@ -787,12 +768,12 @@ async function startAutoCloudSync() {
 
         badge.innerText = '✅ 同期完了'; badge.style.borderColor = '#2ecc71';
         let baseUrl = window.location.href.split('?')[0].split('#')[0];
-        let url = `${baseUrl}?mode=mypage&bin=${jsonbinId}`;
+        let url = `${baseUrl}?mode=input&bin=${jsonbinId}`;
         
         navigator.clipboard.writeText(url).then(() => { 
-            alert('✨ クラウド連携に成功しました！\n\n参加者用のマイページURLをコピーしました。\nこれをQRコードにして皆に共有してください。'); 
+            alert('✨ クラウド連携に成功しました！\n\niPad用の入力URLをコピーしました。\niPadでこのURLを開いてください。'); 
         }).catch(() => { 
-            prompt('以下のURLをコピーしてQRコードにしてください:', url); 
+            prompt('以下のURLをiPadで開いてください:', url); 
         });
 
     } catch (e) {
@@ -830,7 +811,7 @@ async function forcePull() {
     let btn = document.getElementById('force_pull_btn');
     if (btn) { btn.innerText = "🔄 取得中..."; btn.disabled = true; }
     await pullCloudState();
-    if (btn) { btn.innerText = "🔄 最新の状況にアップデートする"; btn.disabled = false; }
+    if (btn) { btn.innerText = "🔄 最新の状況を手動で取得する"; btn.disabled = false; }
     alert("最新の状況にアップデートしました！");
 }
 
@@ -853,7 +834,7 @@ async function pullCloudState() {
             if (remote && remote.updatedAt && remote.updatedAt > (appState.updatedAt || 0)) {
                 appState = remote;
                 ensureMatchesLength(); renderRosterInputs(); renderAll();
-                try { localStorage.setItem('darts_hybrid_v43', JSON.stringify(appState)); } catch(e){}
+                try { localStorage.setItem('darts_hybrid_v44', JSON.stringify(appState)); } catch(e){}
             }
             if (document.getElementById('sync_badge') && currentMode === 'admin') {
                 document.getElementById('sync_badge').innerText = '✅ 同期完了'; 
@@ -873,8 +854,10 @@ window.onload = async () => {
     
     pullCloudState();
     
-    if (currentMode === 'admin' || currentMode === 'input' || currentMode === 'display') {
-        setInterval(pullCloudState, 15000); 
+    // ⚡️ 本部Mac(admin)・モニター画面(display)は「3秒間隔」で超高速同期！
+    // 参加者スマホ(mypage)は自動更新しないのでAPIの無駄遣いはゼロ！
+    if (currentMode === 'admin' || currentMode === 'display') {
+        setInterval(pullCloudState, 3000); 
     }
 };
 </script>
